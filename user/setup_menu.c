@@ -1,0 +1,253 @@
+/*
+ * setup_menu.c
+ *
+ *  Created on: Feb 14, 2021
+ *      Author: domen
+ */
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "lcd.h"
+#include "buttons.h"
+#include "rot_enc.h"
+
+#include "main.h"
+#include "setup_menu.h"
+#include "display_ctrl.h"
+
+// fast encoder rotation that acts as a hour modifier,
+// instead of a default minutes
+#define FAST_ENC_TURN 3
+
+void _show_alarm_state(void);
+
+void _handle_alarm(void);
+void _handle_setup(bool force_refresh);
+
+void _handle_setup_alarm_time(void);
+
+void _handle_setup_time(bool force_refresh, bool h_or_m);
+void _handle_setup_wakeup_time(bool force_refresh);
+void _handle_setup_music(bool force_refresh);
+
+void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
+int multiply_by_sixty(int count);
+
+sm_area_t sm_area;
+bool setup_mode;
+
+bool alarm_enabled;
+configuration_t cfg_data;
+
+extern rot_enc_data_t encoder;
+
+void _clear_lcd_sm_area(void);
+void _clear_lcd_sm_value(void);
+
+void set_alarm_defaults(void)
+{
+  cfg_data.is_enabled = false;
+  cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
+  cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
+  cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
+}
+
+void set_setup_mode(bool is_enabled)
+{
+  setup_mode = is_enabled;
+  if (is_enabled)
+  {
+    sm_area = SETUP_WAKEUP_TIME;
+    rot_enc_reset_count(&encoder);
+
+    // TODO get time from RTC alarm, not current time.
+    LL_RTC_WaitForSynchro(RTC);
+    cfg_data.hms_time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+    cfg_data.hms_time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+
+    _handle_setup(true);
+  }
+  else
+  {
+    // TODO save cfg settings
+    show_time();
+    show_alarm_state();
+
+    LL_RTC_EnterInitMode(RTC);
+    LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[H_POS]));
+    LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[M_POS]));
+    LL_RTC_ExitInitMode(RTC);
+  }
+}
+
+bool is_setup_mode(void)
+{
+  return setup_mode;
+}
+
+void update_settings(void)
+{
+  sm_area++;
+  if (sm_area >= SETUP_DONE)
+  {
+    sm_area = SETUP_WAKEUP_TIME;
+  }
+
+  rot_enc_reset_count(&encoder);
+
+  _handle_setup(true);
+}
+
+void handle_interactions(void)
+{
+  if (is_setup_mode())
+  {
+    _handle_setup(false);
+  }
+  else if (is_alarm_enabled())
+  {
+    // alarm time is updated here via rotary encoder, while alarm state (on/off) is toggled and handled via button
+    _handle_alarm();
+  }
+}
+
+void _handle_setup(bool force_refresh)
+{
+  switch (sm_area)
+  {
+  case SETUP_WAKEUP_TIME:
+    _handle_setup_wakeup_time(force_refresh);
+    break;
+
+  case SETUP_MUSIC:
+    _handle_setup_music(force_refresh);
+    break;
+
+  case SETUP_TIME_H:
+    _handle_setup_time(force_refresh, true);
+    break;
+
+  case SETUP_TIME_M:
+    _handle_setup_time(force_refresh, false);
+    break;
+
+  default:
+    Error_Handler();
+  }
+}
+
+void set_alarm_state(bool is_enabled)
+{
+  cfg_data.is_enabled = is_enabled;
+
+  if (is_enabled)
+  {
+    // discard any encoder increments until now
+    rot_enc_reset_count(&encoder);
+  }
+
+  show_alarm_state();
+}
+
+bool is_alarm_enabled(void)
+{
+  return cfg_data.is_enabled;
+}
+
+// modify alarm settings in the runtime
+void _handle_alarm(void)
+{
+  int16_t count = rot_enc_get_count(&encoder);
+  // alarm is set in minutes
+  if (count != 0)
+  {
+    _manipulate_time(&cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], count);
+
+    show_alarm_state();
+  }
+}
+
+void _handle_setup_wakeup_time(bool force_refresh)
+{
+  char time_str[TIME_STR_SIZE];
+
+  int32_t count = rot_enc_get_count(&encoder);
+  if ((count != 0) || (force_refresh == true))
+  {
+    if ((cfg_data.wakeup_time_min + count) > 255)
+    {
+      cfg_data.wakeup_time_min = 255;
+    }
+    else if ((cfg_data.wakeup_time_min + count) < 0)
+    {
+      cfg_data.wakeup_time_min = 0;
+    }
+    else
+    {
+      cfg_data.wakeup_time_min += count;
+    }
+    sprintf(time_str, "%d", cfg_data.wakeup_time_min);
+    show_setup_item(sm_area, &time_str[0]);
+  }
+}
+
+void _handle_setup_music(bool force_refresh)
+{
+  show_setup_item(sm_area, "<not yet>");
+}
+
+void _handle_setup_time(bool force_refresh, bool change_hours)
+{
+  //change_hours: if True, rotary encoder is setting hours, else minutes
+  char time_str[TIME_STR_SIZE];
+  int8_t count = rot_enc_get_count(&encoder);
+
+  if ((count != 0) || (force_refresh == true))
+  {
+    if (change_hours)
+    {
+      count *= 60;
+    }
+    _manipulate_time(&cfg_data.hms_time[H_POS], &cfg_data.hms_time[M_POS], count);
+
+    time_to_str(time_str, cfg_data.hms_time[H_POS], cfg_data.hms_time[M_POS], -1);
+    show_setup_item(sm_area, time_str);
+  }
+}
+
+void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min)
+{
+  int16_t h = (int16_t)*h_ptr;
+  int16_t m = (int16_t)*m_ptr;
+
+  m += change_min;
+  if (m > 0)
+  {
+    while (m >= 60)
+    {
+      m = m - 60;
+      h++;
+      if (h == 24)
+      {
+        h = 0;
+      }
+    }
+  }
+  else
+  {
+    while (m < 0)
+    {
+      m = m + 60;
+      h--;
+      if (h < 0)
+      {
+        h = 23;
+      }
+    }
+  }
+
+  *h_ptr = (uint8_t)h;
+  *m_ptr = (uint8_t)m;
+}

@@ -1,3 +1,10 @@
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
+build/*
+!build/SunAlarm.elf
+Debug
+
 # Prerequisites
 *.d
 

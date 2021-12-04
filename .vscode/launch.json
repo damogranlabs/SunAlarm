@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug (OpenOCD)",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": false,
+            "executable": "./build/SunAlarm.elf",
+            "device": "STM32F051x8",
+            "configFiles": [
+                "${workspaceRoot}/.vscode/stlink.cfg",
+                "${workspaceRoot}/.vscode/stm32f0x.cfg"
+            ],
+            "svdFile": "${workspaceRoot}/.vscode/STM32F0x1.svd",
+        }
+    ]
+}

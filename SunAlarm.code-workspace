@@ -1,0 +1,35 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "..\\..\\Libs\\common"
+        }
+    ],
+    "settings": {
+        "makefile.makePath": "C:/GnuWin32/bin/make.exe",
+        "makefile.configurations": [
+            {
+                "makePath": "C:/GnuWin32/bin/make.exe",
+                "makeArgs": [
+                    "GCC_PATH=C:/GNU_Arm_Embedded_Toolchain_10.3-2021.10/bin/"
+                ],
+                "name": "Debug"
+            }
+        ],
+        "files.associations": {
+            "buttons.h": "c",
+            "setup_menu.h": "c",
+            "main.h": "c",
+            "stm32f0xx_hal.h": "c",
+            "gpio.h": "c",
+            "display_ctrl.h": "c",
+            "rot_enc.h": "c",
+            "rot_enc_user.h": "c",
+            "stdint.h": "c"
+        },
+        "cortex-debug.armToolchainPath": "C:/GNU_Arm_Embedded_Toolchain_10.3-2021.10/bin/",
+        "cortex-debug.openocdPath": "C:/xpack-openocd-0.11.0-2/bin/openocd.exe",
+    }
+}

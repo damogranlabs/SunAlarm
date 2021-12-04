@@ -1,0 +1,9 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "${workspaceFolder}/build",
+            "binaryPath": "${workspaceFolder}/build/SunAlarm.elf"
+        }
+    ]
+}
