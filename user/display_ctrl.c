@@ -36,6 +36,7 @@
 #define M_VALUE_X 0
 
 #define M_AREA_WAKEUP_TIME "Vzhod"
+#define M_AREA_SUN_INTENSITY "Sonce"
 #define M_AREA_MUSIC "MUSIC"
 #define M_AREA_TIME "Ura"
 
@@ -91,6 +92,13 @@ void show_setup_item(sm_area_t sm_area, char *value_str)
 
   case SETUP_MUSIC:
     sprintf(setting_str, "@ %s:", M_AREA_MUSIC);
+    break;
+
+  case SETUP_SUN_MIN_INTENSITY:
+    sprintf(setting_str, "@ %s (min):", M_AREA_SUN_INTENSITY);
+    break;
+  case SETUP_SUN_MAX_INTENSITY:
+    sprintf(setting_str, "@ %s (max):", M_AREA_SUN_INTENSITY);
     break;
 
   case SETUP_TIME_H:

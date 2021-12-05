@@ -75,7 +75,7 @@ void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 2 */
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-    /**TIM1 GPIO Configuration
+  /**TIM1 GPIO Configuration
     PA11     ------> TIM1_CH4
     */
   GPIO_InitStruct.Pin = LIGHT_OUT_Pin;
@@ -85,7 +85,6 @@ void MX_TIM1_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_2;
   LL_GPIO_Init(LIGHT_OUT_GPIO_Port, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 1 */

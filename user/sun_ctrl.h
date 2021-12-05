@@ -10,12 +10,14 @@
 
 #include <stdint.h>
 
+#define SUN_INTENSITY_MIN 0
+#define SUN_INTENSITY_MAX 255
+
 void sun_init(void);
 
 void sun_pwr_on(void);
 void sun_pwr_off(void);
 
-void sun_set_indensity(uint16_t intensity);
-
+void sun_set_intensity(uint8_t intensity);
 
 #endif /* SUN_CTRL_H_ */
