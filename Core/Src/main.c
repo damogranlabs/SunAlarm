@@ -118,29 +118,18 @@ int main(void)
   //while (!LL_RTC_IsActiveFlag_RS(RTC))
   //{
   //};
-  //sun_init();
-  //
-  //HAL_Delay(1000);
-  //sun_pwr_off();
+
+  sun_init();
 
   // TODO load cfg data from flash
   set_alarm_defaults();
-
   show_alarm_state();
-  // LL_EXTI_GenerateSWI_0_31(LL_EXTI_LINE_17);
-  // NVIC_SetPendingIRQ(RTC_IRQn);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // TODO move to RTC interrupt routine
-    if (!is_setup_mode())
-    {
-      //show_time();
-    }
-
     handle_buttons();
 
     handle_interactions();

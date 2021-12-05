@@ -50,14 +50,8 @@ void MX_RTC_Init(void)
   LL_RTC_SetAsynchPrescaler(RTC, 127);
   LL_RTC_SetSynchPrescaler(RTC, 255);
   /* USER CODE BEGIN RTC_Init 2 */
-
   LL_RTC_DisableWriteProtection(RTC);
   LL_RTC_EnableShadowRegBypass(RTC);
-
-  //LL_RTC_EnableInitMode(RTC);
-  //LL_RTC_TIME_Config(RTC, LL_RTC_TIME_FORMAT_AM_OR_24, 0, 0, 5);
-  ////LL_RTC_DATE_Config(RTC, LL_RTC_WEEKDAY_MONDAY, 1, LL_RTC_MONTH_JANUARY, 0);
-  //LL_RTC_DisableInitMode(RTC);
 
   // interrupt on 1 second
   LL_EXTI_InitTypeDef EXTI_InitStruct = {0};
@@ -79,6 +73,7 @@ void MX_RTC_Init(void)
   LL_RTC_EnableIT_ALRA(RTC);
   LL_RTC_ALMA_Enable(RTC);
   /* USER CODE END RTC_Init 2 */
+
 }
 
 /* USER CODE BEGIN 1 */
