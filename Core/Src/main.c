@@ -104,6 +104,7 @@ int main(void)
   lcd_init(2, 16);
   lcd_clear();
 
+  /*
   LL_RTC_EnterInitMode(RTC);
   LL_RTC_TIME_Config(RTC,
                      LL_RTC_TIME_FORMAT_AM_OR_24,
@@ -112,6 +113,7 @@ int main(void)
                      __LL_RTC_CONVERT_BIN2BCD(0));
   LL_RTC_ExitInitMode(RTC);
   LL_RTC_WaitForSynchro(RTC);
+  */
   //LL_RTC_EnableWriteProtection(RTC);
   //while (!LL_RTC_IsActiveFlag_RS(RTC))
   //{

@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "setup_menu.h"
+
 #define TIME_STR_SIZE 8 // HH:MM:SS
 
 void show_time(void);

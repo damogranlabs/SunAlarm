@@ -49,10 +49,15 @@ void MX_RTC_Init(void)
   LL_RTC_Init(RTC, &RTC_InitStruct);
   LL_RTC_SetAsynchPrescaler(RTC, 127);
   LL_RTC_SetSynchPrescaler(RTC, 255);
-
   /* USER CODE BEGIN RTC_Init 2 */
+
   LL_RTC_DisableWriteProtection(RTC);
   LL_RTC_EnableShadowRegBypass(RTC);
+
+  //LL_RTC_EnableInitMode(RTC);
+  //LL_RTC_TIME_Config(RTC, LL_RTC_TIME_FORMAT_AM_OR_24, 0, 0, 5);
+  ////LL_RTC_DATE_Config(RTC, LL_RTC_WEEKDAY_MONDAY, 1, LL_RTC_MONTH_JANUARY, 0);
+  //LL_RTC_DisableInitMode(RTC);
 
   // interrupt on 1 second
   LL_EXTI_InitTypeDef EXTI_InitStruct = {0};
@@ -62,27 +67,16 @@ void MX_RTC_Init(void)
   EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING;
   EXTI_InitStruct.LineCommand = ENABLE;
   LL_EXTI_Init(&EXTI_InitStruct);
-  //LL_EXTI_EnableEvent_0_31(LL_EXTI_LINE_17);
+
+  NVIC_ClearPendingIRQ(RTC_IRQn);
+  NVIC_SetPriority(RTC_IRQn, 0);
+  NVIC_EnableIRQ(RTC_IRQn);
 
   LL_RTC_ALMA_Disable(RTC);
-  LL_RTC_AlarmTypeDef sec_alarm; // = {0};
-  LL_RTC_ALMA_StructInit(&sec_alarm);
-  sec_alarm.AlarmDateWeekDaySel = LL_RTC_ALMA_DATEWEEKDAYSEL_WEEKDAY;
-  //sec_alarm.AlarmTime.TimeFormat = LL_RTC_TIME_FORMAT_AM_OR_24;
-  //sec_alarm.AlarmMask = LL_RTC_ALMA_MASK_ALL;
-  sec_alarm.AlarmMask = LL_RTC_ALMA_MASK_NONE;
-  if (LL_RTC_ALMA_Init(RTC, LL_RTC_FORMAT_BIN, &sec_alarm) == ERROR)
-  {
-    Error_Handler();
-  };
+  LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_ALL);
 
   LL_RTC_ClearFlag_ALRA(RTC);
   LL_RTC_EnableIT_ALRA(RTC);
-
-  NVIC_ClearPendingIRQ(RTC_IRQn);
-  NVIC_SetPriority(RTC_IRQn, 1);
-  NVIC_EnableIRQ(RTC_IRQn);
-
   LL_RTC_ALMA_Enable(RTC);
   /* USER CODE END RTC_Init 2 */
 }

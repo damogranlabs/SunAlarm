@@ -24,7 +24,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rot_enc.h"
-//#include "display_ctrl.h"
+#include "display_ctrl.h"
+#include "setup_menu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -165,13 +166,23 @@ void EXTI0_1_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-
+/**
+  * @brief This function handles RTC global interrupt through EXTI lines 17, 19 and 20.
+  */
 void RTC_IRQHandler(void)
 {
-  //LL_RTC_ClearFlag_ALRA()
+  /* USER CODE BEGIN RTC_IRQn 0 */
+  if (!is_setup_mode())
+  {
+    show_time();
+  }
+  LL_RTC_ClearFlag_ALRA(RTC);
   LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_17);
-  lcd_print_str(0, 0, "i");
-  //show_time();
+  /* USER CODE END RTC_IRQn 0 */
+
+  /* USER CODE BEGIN RTC_IRQn 1 */
+
+  /* USER CODE END RTC_IRQn 1 */
 }
 
 /* USER CODE END 1 */
