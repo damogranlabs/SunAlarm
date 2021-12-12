@@ -69,7 +69,7 @@ void show_time(void)
 void show_alarm_state()
 {
   lcd_clear_area(A_SETTINGS_Y, A_SETTINGS_X, LCD_X_SIZE);
-  if (cfg_data.is_enabled)
+  if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
     _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT) + 1, cfg_data.alarm_time[H_POS], cfg_data.alarm_time[M_POS], -1);

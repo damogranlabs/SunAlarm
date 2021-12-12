@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "rtc.h"
 #include "tim.h"
 #include "gpio.h"
@@ -95,8 +96,10 @@ int main(void)
   MX_GPIO_Init();
   MX_RTC_Init();
   MX_TIM1_Init();
+  MX_ADC_Init();
   /* USER CODE BEGIN 2 */
-  register_button(B0_GPIO_Port, B0_Pin, BTN_MODE_LONGPRESS);
+  register_button(B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
+  register_button(B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
 
   rot_enc_init(&encoder, ENC_A_GPIO_Port, ENC_A_Pin, ENC_B_GPIO_Port, ENC_B_Pin);
   rot_enc_set_direction(&encoder, ROT_ENC_INC_CCW);
@@ -122,7 +125,7 @@ int main(void)
   sun_init();
 
   // TODO load cfg data from flash
-  set_alarm_defaults();
+  set_defaults();
   show_alarm_state();
   /* USER CODE END 2 */
 
@@ -154,9 +157,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSI14 | RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSI14State = RCC_HSI14_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.HSI14CalibrationValue = 16;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)

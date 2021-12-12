@@ -38,10 +38,9 @@ void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
 int multiply_by_sixty(int count);
 
 sm_area_t sm_area;
-bool setup_mode;
 
-bool alarm_enabled;
 configuration_t cfg_data;
+runtime_mode_t runtime_mode;
 
 extern rot_enc_data_t encoder;
 
@@ -50,7 +49,7 @@ void _clear_lcd_sm_value(void);
 
 void set_alarm_defaults(void)
 {
-  cfg_data.is_enabled = false;
+  cfg_data.is_alarm_enabled = false;
   cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
   cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
   cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
@@ -58,9 +57,18 @@ void set_alarm_defaults(void)
   cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
 }
 
+void set_defaults(void)
+{
+  runtime_mode.is_setup_mode = false;
+  runtime_mode.is_sun_enabled = false;
+  runtime_mode.is_alarm_active = false;
+
+  set_alarm_defaults();
+}
+
 void set_setup_mode(bool is_enabled)
 {
-  setup_mode = is_enabled;
+  runtime_mode.is_setup_mode = is_enabled;
   if (is_enabled)
   {
     sm_area = SETUP_WAKEUP_TIME;
@@ -91,7 +99,12 @@ void set_setup_mode(bool is_enabled)
 
 bool is_setup_mode(void)
 {
-  return setup_mode;
+  return runtime_mode.is_setup_mode;
+}
+
+bool is_sun_enabled(void)
+{
+  return runtime_mode.is_sun_enabled;
 }
 
 void update_settings(void)
@@ -153,7 +166,7 @@ void _handle_setup(bool force_refresh)
 
 void set_alarm_state(bool is_enabled)
 {
-  cfg_data.is_enabled = is_enabled;
+  cfg_data.is_alarm_enabled = is_enabled;
 
   if (is_enabled)
   {
@@ -166,7 +179,12 @@ void set_alarm_state(bool is_enabled)
 
 bool is_alarm_enabled(void)
 {
-  return cfg_data.is_enabled;
+  return cfg_data.is_alarm_enabled;
+}
+
+bool is_alarm_active(void)
+{
+  return runtime_mode.is_alarm_active;
 }
 
 // modify alarm settings in the runtime

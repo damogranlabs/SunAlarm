@@ -46,7 +46,7 @@ btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg)
  */
 void on_button_press(btn_cfg_t *btn_cfg)
 {
-  if ((btn_cfg->gpio_port == B0_GPIO_Port) && (btn_cfg->gpio_pin == B0_Pin))
+  if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
   {
     if (is_setup_mode())
     {
@@ -56,6 +56,10 @@ void on_button_press(btn_cfg_t *btn_cfg)
     {
       set_alarm_state(!is_alarm_enabled());
     }
+  }
+  else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
+  {
+    /* code */
   }
 }
 
@@ -67,7 +71,7 @@ void on_button_press(btn_cfg_t *btn_cfg)
  */
 void on_button_longpress(btn_cfg_t *btn_cfg)
 {
-  if ((btn_cfg->gpio_port == B0_GPIO_Port) && (btn_cfg->gpio_pin == B0_Pin))
+  if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
   {
     set_setup_mode(!is_setup_mode());
   }

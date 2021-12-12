@@ -33,7 +33,7 @@ typedef enum
 
 typedef struct configuration_t
 {
-  bool is_enabled;
+  bool is_alarm_enabled;
   uint8_t hms_time[3];   //  HMS
   uint8_t alarm_time[2]; //  HM
   uint8_t wakeup_time_min;
@@ -43,12 +43,21 @@ typedef struct configuration_t
   // TODO setup music
 } configuration_t;
 
-void set_alarm_defaults(void);
+typedef struct runtime_mode_t
+{
+  bool is_setup_mode;
+  bool is_sun_enabled;
+  bool is_alarm_active;
+} runtime_mode_t;
+
+void set_defaults(void);
 void set_alarm_state(bool is_enabled);
 bool is_alarm_enabled(void);
+bool is_alarm_active(void);
 
 void set_setup_mode(bool is_enabled);
 bool is_setup_mode(void);
+bool is_sun_enabled(void);
 
 void handle_interactions(void);
 
