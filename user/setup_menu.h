@@ -13,6 +13,7 @@
 #define DEFAULT_WAKEUP_TIME_MIN 3
 #define DEFAULT_SUN_INTENSITY_MIN 10
 #define DEFAULT_SUN_INTENSITY_MAX SUN_INTENSITY_MAX
+#define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
 #define DEFAULT_ALARM_TIME_H 6
 #define DEFAULT_ALARM_TIME_M 30
 
@@ -25,6 +26,7 @@ typedef enum
   SETUP_WAKEUP_TIME,
   SETUP_SUN_MIN_INTENSITY,
   SETUP_SUN_MAX_INTENSITY,
+  SETUP_SUN_DEFAULT_INTENSITY,
   SETUP_MUSIC,
   SETUP_TIME_H,
   SETUP_TIME_M,
@@ -39,6 +41,7 @@ typedef struct configuration_t
   uint8_t wakeup_time_min;
   uint8_t sun_intensity_min;
   uint8_t sun_intensity_max;
+  uint8_t sun_manual_intensity;
 
   // TODO setup music
 } configuration_t;
@@ -57,7 +60,10 @@ bool is_alarm_active(void);
 
 void set_setup_mode(bool is_enabled);
 bool is_setup_mode(void);
+
 bool is_sun_enabled(void);
+void set_sun_enabled(bool is_enabled);
+void toggle_sun_state(void);
 
 void handle_interactions(void);
 

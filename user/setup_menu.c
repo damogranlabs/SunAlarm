@@ -18,11 +18,9 @@
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
 
-// fast encoder rotation that acts as a hour modifier,
-// instead of a default minutes
-#define FAST_ENC_TURN 3
-
 void _show_alarm_state(void);
+
+void _set_alarm_defaults(void);
 
 void _handle_alarm(void);
 void _handle_setup(bool force_refresh);
@@ -31,6 +29,7 @@ void _handle_setup_alarm_time(void);
 
 void _handle_setup_time(bool force_refresh, bool h_or_m);
 void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity);
+void _handle_setup_sun_manual_intensity(bool force_refresh);
 void _handle_setup_wakeup_time(bool force_refresh);
 void _handle_setup_music(bool force_refresh);
 
@@ -47,7 +46,7 @@ extern rot_enc_data_t encoder;
 void _clear_lcd_sm_area(void);
 void _clear_lcd_sm_value(void);
 
-void set_alarm_defaults(void)
+void _set_alarm_defaults(void)
 {
   cfg_data.is_alarm_enabled = false;
   cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
@@ -55,6 +54,7 @@ void set_alarm_defaults(void)
   cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
   cfg_data.sun_intensity_min = DEFAULT_SUN_INTENSITY_MIN;
   cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
+  cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
 }
 
 void set_defaults(void)
@@ -63,7 +63,7 @@ void set_defaults(void)
   runtime_mode.is_sun_enabled = false;
   runtime_mode.is_alarm_active = false;
 
-  set_alarm_defaults();
+  _set_alarm_defaults();
 }
 
 void set_setup_mode(bool is_enabled)
@@ -74,7 +74,6 @@ void set_setup_mode(bool is_enabled)
     sm_area = SETUP_WAKEUP_TIME;
     rot_enc_reset_count(&encoder);
 
-    // TODO get time from RTC alarm, not current time.
     LL_RTC_WaitForSynchro(RTC);
     cfg_data.hms_time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
     cfg_data.hms_time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
@@ -102,9 +101,29 @@ bool is_setup_mode(void)
   return runtime_mode.is_setup_mode;
 }
 
+void set_sun_enabled(bool is_enabled)
+{
+  runtime_mode.is_sun_enabled = is_enabled;
+}
+
 bool is_sun_enabled(void)
 {
   return runtime_mode.is_sun_enabled;
+}
+
+void toggle_sun_state(void)
+{
+  if (is_sun_enabled())
+  {
+    sun_pwr_off();
+    set_sun_enabled(false);
+  }
+  else
+  {
+    sun_set_intensity(cfg_data.sun_manual_intensity);
+    sun_pwr_on();
+    set_sun_enabled(true);
+  }
 }
 
 void update_settings(void)
@@ -146,6 +165,10 @@ void _handle_setup(bool force_refresh)
     break;
   case SETUP_SUN_MAX_INTENSITY:
     _handle_setup_sun_intensity(force_refresh, false);
+    break;
+
+  case SETUP_SUN_DEFAULT_INTENSITY:
+    _handle_setup_sun_manual_intensity(force_refresh);
     break;
 
   case SETUP_MUSIC:
@@ -292,6 +315,36 @@ void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity)
       sprintf(time_str, "%d", cfg_data.sun_intensity_max);
     }
     show_setup_item(sm_area, time_str);
+  }
+}
+
+void _handle_setup_sun_manual_intensity(bool force_refresh)
+{
+  char val_str[3]; // 0 - SUN_INTENSITY_MAX
+  int16_t count = rot_enc_get_count(&encoder);
+  uint16_t value;
+
+  if ((count != 0) || (force_refresh == true))
+  {
+    value = (uint16_t)cfg_data.sun_manual_intensity + count;
+
+    if (value > SUN_INTENSITY_MAX)
+    {
+      cfg_data.sun_manual_intensity = SUN_INTENSITY_MAX;
+    }
+    else if (value <= 0)
+    {
+      cfg_data.sun_manual_intensity = 0;
+    }
+    else
+    {
+      cfg_data.sun_manual_intensity = (uint8_t)value;
+    }
+
+    sun_set_intensity(cfg_data.sun_manual_intensity);
+    sprintf(val_str, "%d", cfg_data.sun_manual_intensity);
+
+    show_setup_item(sm_area, val_str);
   }
 }
 

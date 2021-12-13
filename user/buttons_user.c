@@ -59,7 +59,7 @@ void on_button_press(btn_cfg_t *btn_cfg)
   }
   else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
   {
-    /* code */
+    toggle_sun_state();
   }
 }
 

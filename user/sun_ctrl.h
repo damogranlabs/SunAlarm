@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 #define SUN_INTENSITY_MIN 0
-#define SUN_INTENSITY_MAX 255
+#define SUN_INTENSITY_MAX 100
 
 void sun_init(void);
 

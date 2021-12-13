@@ -12,14 +12,14 @@
 
 // add device/project specific includes
 #include "stm32f0xx_ll_gpio.h"
- 
-#define NUM_OF_BUTTONS 1 // number max registered buttons
+
+#define NUM_OF_BUTTONS 5 // number max registered buttons
 
 // define GPIO port/pin object type
 #define BTN_GPIO_PORT_TYPE GPIO_TypeDef
 #define BTN_GPIO_PIN_TYPE uint32_t
 
-#define BTN_PRESS_TIME_MS 30 // usual debounce time
+#define BTN_PRESS_TIME_MS 30       // usual debounce time
 #define BTN_AFTER_PRESS_TIME_MS 15 // time after which new press-es are allowed to happen
 // NOTE: BTN_AFTER_PRESS_TIME_MS does not affect REPETITIVE mode timing settings
 
