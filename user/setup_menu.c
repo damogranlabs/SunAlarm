@@ -86,7 +86,7 @@ void set_setup_mode(bool is_enabled)
   }
   else
   {
-    // TODO save cfg settings
+    // TODO save cfg settings to flash?
     show_time();
     show_alarm_state();
     sun_pwr_off();
