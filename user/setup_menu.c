@@ -248,12 +248,11 @@ uint32_t _get_next_alarm_intensity_timestamp(void)
 
 uint8_t _get_next_alarm_sun_intensity(void)
 {
-  uint8_t num_of_steps = cfg_data.sun_intensity_max - cfg_data.sun_intensity_min;
-  static uint16_t step_counter = 0;
+  static uint8_t step_counter = 0;
 
   step_counter++;
 
-  return step_counter;
+  return cfg_data.sun_intensity_min + step_counter;
 }
 
 void _handle_setup(bool force_refresh)
