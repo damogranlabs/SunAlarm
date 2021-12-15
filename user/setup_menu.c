@@ -22,7 +22,7 @@ void _show_alarm_state(void);
 
 void _set_alarm_defaults(void);
 
-void _handle_alarm(void);
+void _handle_alarm_time(void);
 void _handle_setup(bool force_refresh);
 
 void _handle_setup_alarm_time(void);
@@ -34,12 +34,14 @@ void _handle_setup_wakeup_time(bool force_refresh);
 void _handle_setup_music(bool force_refresh);
 
 void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
-int multiply_by_sixty(int count);
+
+uint32_t _get_alarm_sun_intensity_sec_per_step(void);
+uint32_t _get_next_alarm_intensity_timestamp(void);
+uint8_t _get_next_alarm_sun_intensity(void);
 
 sm_area_t sm_area;
-
 configuration_t cfg_data;
-runtime_mode_t runtime_mode;
+runtime_data_t runtime_data;
 
 extern rot_enc_data_t encoder;
 
@@ -59,16 +61,16 @@ void _set_alarm_defaults(void)
 
 void set_defaults(void)
 {
-  runtime_mode.is_setup_mode = false;
-  runtime_mode.is_sun_enabled = false;
-  runtime_mode.is_alarm_active = false;
+  runtime_data.is_setup_mode = false;
+  runtime_data.is_sun_enabled = false;
+  runtime_data.is_alarm_active = false;
 
   _set_alarm_defaults();
 }
 
 void set_setup_mode(bool is_enabled)
 {
-  runtime_mode.is_setup_mode = is_enabled;
+  runtime_data.is_setup_mode = is_enabled;
   if (is_enabled)
   {
     sm_area = SETUP_WAKEUP_TIME;
@@ -98,17 +100,17 @@ void set_setup_mode(bool is_enabled)
 
 bool is_setup_mode(void)
 {
-  return runtime_mode.is_setup_mode;
+  return runtime_data.is_setup_mode;
 }
 
 void set_sun_enabled(bool is_enabled)
 {
-  runtime_mode.is_sun_enabled = is_enabled;
+  runtime_data.is_sun_enabled = is_enabled;
 }
 
 bool is_sun_enabled(void)
 {
-  return runtime_mode.is_sun_enabled;
+  return runtime_data.is_sun_enabled;
 }
 
 void toggle_sun_state(void)
@@ -148,8 +150,110 @@ void handle_interactions(void)
   else if (is_alarm_enabled())
   {
     // alarm time is updated here via rotary encoder, while alarm state (on/off) is toggled and handled via button
-    _handle_alarm();
+    _handle_alarm_time();
   }
+}
+
+void handle_alarm(void)
+{
+  uint8_t h, m, s;
+  static uint32_t next_sun_intensity_timestamp;
+  static uint32_t end_timestamp;
+
+  if (!cfg_data.is_alarm_enabled)
+    return;
+
+  if (is_setup_mode())
+    return;
+
+  if (runtime_data.is_alarm_active)
+  {
+    // alarm is already in progress
+    h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+    m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+    if (h == runtime_data.alarm_end_time[H_POS])
+    {
+      if (m == runtime_data.alarm_end_time[M_POS])
+      {
+        // finish alarm
+        runtime_data.is_alarm_active = false;
+        sun_set_intensity(cfg_data.sun_intensity_max);
+
+        return;
+      }
+    }
+
+    if (HAL_GetTick() >= next_sun_intensity_timestamp)
+    {
+      next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+      sun_set_intensity(_get_next_alarm_sun_intensity());
+
+      return;
+    }
+  }
+  else
+  {
+    // check if it is alarm time
+    s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
+    if (s == 0)
+    {
+      h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+      if (h == cfg_data.alarm_time[H_POS])
+      {
+        m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+        if (m == cfg_data.alarm_time[M_POS])
+        {
+          // its is wake up time!
+          runtime_data.is_alarm_active = true;
+          sun_set_intensity(cfg_data.sun_intensity_min);
+          sun_pwr_on();
+
+          runtime_data.alarm_end_time[H_POS] = h;
+          runtime_data.alarm_end_time[M_POS] = m;
+          _manipulate_time(&runtime_data.alarm_end_time[H_POS],
+                           &runtime_data.alarm_end_time[M_POS],
+                           cfg_data.wakeup_time_min);
+          next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+        }
+      }
+    }
+  }
+}
+
+uint32_t _get_alarm_sun_intensity_sec_per_step(void)
+{
+  static uint16_t sec_per_step = 0;
+
+  if (sec_per_step == 0)
+  {
+    sec_per_step = ((uint32_t)cfg_data.wakeup_time_min * 60) / ((uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min));
+  }
+
+  return sec_per_step;
+}
+
+uint32_t _get_next_alarm_intensity_timestamp(void)
+{
+  static uint32_t next_sun_intensity_timestamp = 0;
+
+  if (next_sun_intensity_timestamp == 0)
+  {
+    next_sun_intensity_timestamp = HAL_GetTick();
+  }
+
+  next_sun_intensity_timestamp += _get_alarm_sun_intensity_sec_per_step() * 1000; // ms -> sec
+
+  return next_sun_intensity_timestamp;
+}
+
+uint8_t _get_next_alarm_sun_intensity(void)
+{
+  uint8_t num_of_steps = cfg_data.sun_intensity_max - cfg_data.sun_intensity_min;
+  static uint16_t step_counter = 0;
+
+  step_counter++;
+
+  return step_counter;
 }
 
 void _handle_setup(bool force_refresh)
@@ -207,11 +311,11 @@ bool is_alarm_enabled(void)
 
 bool is_alarm_active(void)
 {
-  return runtime_mode.is_alarm_active;
+  return runtime_data.is_alarm_active;
 }
 
 // modify alarm settings in the runtime
-void _handle_alarm(void)
+void _handle_alarm_time(void)
 {
   int16_t count = rot_enc_get_count(&encoder);
   // alarm is set in minutes

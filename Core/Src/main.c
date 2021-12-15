@@ -135,6 +135,8 @@ int main(void)
 
     handle_interactions();
 
+    handle_alarm();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

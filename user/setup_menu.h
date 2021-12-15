@@ -46,12 +46,13 @@ typedef struct configuration_t
   // TODO setup music
 } configuration_t;
 
-typedef struct runtime_mode_t
+typedef struct runtime_data_t
 {
   bool is_setup_mode;
   bool is_sun_enabled;
   bool is_alarm_active;
-} runtime_mode_t;
+  uint8_t alarm_end_time[2]; //  HM
+} runtime_data_t;
 
 void set_defaults(void);
 void set_alarm_state(bool is_enabled);
@@ -66,6 +67,7 @@ void set_sun_enabled(bool is_enabled);
 void toggle_sun_state(void);
 
 void handle_interactions(void);
+void handle_alarm(void);
 
 void update_settings(void);
 
