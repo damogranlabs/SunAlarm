@@ -11,11 +11,6 @@
 
 #include "sun_ctrl.h"
 
-// TIM1 CH4, PA11, PIR2
-
-#define SUN_TIM TIM1
-#define SUN_TIM_CH LL_TIM_CHANNEL_CH4
-
 void sun_init(void)
 {
   LL_TIM_EnableAllOutputs(SUN_TIM);
@@ -45,12 +40,23 @@ void sun_pwr_off(void)
   _sun_pwr_ctrl(false);
 }
 
+uint32_t get_sun_intensity_resolution(void)
+{
+  return LL_TIM_GetAutoReload(SUN_TIM);
+}
+
 void sun_set_intensity(uint8_t intensity)
 {
-  assert_param(intensity <= 255);
-  assert_param(intensity >= 0);
+  assert_param(intensity <= SUN_INTENSITY_MAX);
 
   // percent to value conversion
-  uint32_t compare_val = (LL_TIM_GetAutoReload(SUN_TIM) / SUN_INTENSITY_MAX) * intensity;
+  uint32_t compare_val = get_sun_intensity_resolution() / SUN_INTENSITY_MAX * intensity;
   LL_TIM_OC_SetCompareCH4(SUN_TIM, compare_val);
+}
+
+void sun_set_intensity_precise(uint32_t intensity)
+{
+  assert_param(intensity <= get_sun_intensity_resolution());
+
+  LL_TIM_OC_SetCompareCH4(SUN_TIM, (uint32_t)intensity);
 }

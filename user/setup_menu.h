@@ -53,7 +53,7 @@ typedef struct runtime_data_t
   bool is_alarm_active;
   uint8_t alarm_start_time[2]; //  HM
   uint8_t alarm_end_time[2];   //  HM
-  uint8_t current_alarm_sun_intensity;
+  uint32_t current_alarm_sun_intensity;
   uint32_t next_alarm_sun_intensity_timestamp; //msec
 } runtime_data_t;
 

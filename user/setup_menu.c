@@ -34,7 +34,7 @@ void _handle_setup_music(bool force_refresh);
 void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
 
 uint32_t _get_alarm_sun_intensity_msec_per_step(void);
-uint8_t _get_next_alarm_sun_intensity(bool reset);
+uint32_t _get_next_alarm_sun_intensity(bool reset);
 
 sm_area_t sm_area;
 configuration_t cfg_data;
@@ -190,8 +190,8 @@ void handle_alarm(void)
         {
           // finish alarm
           set_alarm_active(false);
-          sun_set_intensity(cfg_data.sun_intensity_max);
 
+          // do not power off. just let the user turn the sun/alarm off.
           return;
         }
       }
@@ -200,7 +200,7 @@ void handle_alarm(void)
     {
       runtime_data.next_alarm_sun_intensity_timestamp += _get_alarm_sun_intensity_msec_per_step();
       runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(false);
-      sun_set_intensity(runtime_data.current_alarm_sun_intensity);
+      sun_set_intensity_precise(runtime_data.current_alarm_sun_intensity);
 
       return;
     }
@@ -220,10 +220,9 @@ void handle_alarm(void)
           // its is wake up time!
           runtime_data.next_alarm_sun_intensity_timestamp = HAL_GetTick() + _get_alarm_sun_intensity_msec_per_step();
           runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(true);
-          sun_set_intensity(runtime_data.current_alarm_sun_intensity);
 
           set_alarm_active(true);
-          sun_set_intensity(runtime_data.current_alarm_sun_intensity);
+          sun_set_intensity_precise(runtime_data.current_alarm_sun_intensity);
           sun_pwr_on();
         }
       }
@@ -233,31 +232,35 @@ void handle_alarm(void)
 
 uint32_t _get_alarm_sun_intensity_msec_per_step(void)
 {
-  static uint32_t msec_per_step = 0;
+  uint32_t num_of_steps = (get_sun_intensity_resolution() / SUN_INTENSITY_MAX) * (uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min);
 
-  if (msec_per_step == 0)
+  //60000 = 60 * 1000 (min -> sec -> sec -> msec)
+  uint32_t msec_per_step = (((uint32_t)cfg_data.wakeup_time_min) * 60000) / num_of_steps;
+
+  // At very low wakeup times, it might be that msec_per_step is lower than 1.
+  // In that case, just set it to 1 step per msec
+  if (!msec_per_step)
   {
-    //60000 = 60 * 1000 (min -> sec -> sec -> msec)
-    msec_per_step = (((uint32_t)cfg_data.wakeup_time_min) * 60000) / ((uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min));
+    msec_per_step = 1;
   }
 
   return msec_per_step;
 }
 
-uint8_t _get_next_alarm_sun_intensity(bool reset)
+uint32_t _get_next_alarm_sun_intensity(bool reset)
 {
-  static uint8_t step_counter = 0;
+  static uint32_t intensity = 0;
 
   if (reset)
   {
-    step_counter = 0;
+    intensity = (uint32_t)cfg_data.sun_intensity_min;
   }
   else
   {
-    step_counter++;
+    intensity++;
   }
 
-  return cfg_data.sun_intensity_min + step_counter;
+  return intensity;
 }
 
 void _handle_setup(bool force_refresh)
