@@ -183,10 +183,10 @@ void handle_alarm(void)
     if (s == 0)
     {
       h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-      if (h == runtime_data.alarm_end_time[H_POS])
+      if (h == cfg_data.alarm_time[H_POS])
       {
         m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-        if (m == runtime_data.alarm_end_time[M_POS])
+        if (m == cfg_data.alarm_time[M_POS])
         {
           // finish alarm
           set_alarm_active(false);
@@ -218,6 +218,7 @@ void handle_alarm(void)
         if (m == runtime_data.alarm_start_time[M_POS])
         {
           // its is wake up time!
+
           runtime_data.next_alarm_sun_intensity_timestamp = HAL_GetTick() + _get_alarm_sun_intensity_msec_per_step();
           runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(true);
 
