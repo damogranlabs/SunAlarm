@@ -22,7 +22,10 @@
 #define T_Y 0
 #define T_X 1 // -1 = left aligned, 1 = right aligned.
 
-// alarm info position
+// alarm current status (active) position
+#define A_ACTIVE_Y 0
+#define A_ACTIVE_X 0
+// alarm time info position
 #define A_SETTINGS_Y 1
 #define A_SETTINGS_X 0
 #define A_TIME_XPOS 6
@@ -78,6 +81,18 @@ void show_alarm_state()
   else
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_OFF_TEXT);
+  }
+}
+
+void show_alarm_active_state(bool is_active)
+{
+  if (is_active)
+  {
+    lcd_print_str(A_ACTIVE_Y, A_ACTIVE_X, "!");
+  }
+  else
+  {
+    lcd_print_str(A_ACTIVE_Y, A_ACTIVE_X, " ");
   }
 }
 

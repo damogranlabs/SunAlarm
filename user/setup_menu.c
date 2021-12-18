@@ -19,14 +19,12 @@
 #include "display_ctrl.h"
 
 void _show_alarm_state(void);
-
 void _set_alarm_defaults(void);
-
+void _set_alarm_start_time(void);
 void _handle_alarm_time(void);
+
 void _handle_setup(bool force_refresh);
-
 void _handle_setup_alarm_time(void);
-
 void _handle_setup_time(bool force_refresh, bool h_or_m);
 void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity);
 void _handle_setup_sun_manual_intensity(bool force_refresh);
@@ -35,9 +33,8 @@ void _handle_setup_music(bool force_refresh);
 
 void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
 
-uint32_t _get_alarm_sun_intensity_sec_per_step(void);
-uint32_t _get_next_alarm_intensity_timestamp(void);
-uint8_t _get_next_alarm_sun_intensity(void);
+uint32_t _get_alarm_sun_intensity_msec_per_step(void);
+uint8_t _get_next_alarm_sun_intensity(bool reset);
 
 sm_area_t sm_area;
 configuration_t cfg_data;
@@ -64,8 +61,11 @@ void set_defaults(void)
   runtime_data.is_setup_mode = false;
   runtime_data.is_sun_enabled = false;
   runtime_data.is_alarm_active = false;
+  runtime_data.current_alarm_sun_intensity = cfg_data.sun_intensity_min;
+  runtime_data.next_alarm_sun_intensity_timestamp = 0;
 
   _set_alarm_defaults();
+  _set_alarm_start_time();
 }
 
 void set_setup_mode(bool is_enabled)
@@ -95,6 +95,8 @@ void set_setup_mode(bool is_enabled)
     LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[H_POS]));
     LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[M_POS]));
     LL_RTC_ExitInitMode(RTC);
+
+    _set_alarm_start_time();
   }
 }
 
@@ -154,39 +156,51 @@ void handle_interactions(void)
   }
 }
 
+void _set_alarm_start_time(void)
+{
+  runtime_data.alarm_start_time[H_POS] = cfg_data.alarm_time[H_POS];
+  runtime_data.alarm_start_time[M_POS] = cfg_data.alarm_time[M_POS];
+  _manipulate_time(&runtime_data.alarm_start_time[H_POS],
+                   &runtime_data.alarm_start_time[M_POS],
+                   -cfg_data.wakeup_time_min);
+}
+
 void handle_alarm(void)
 {
   uint8_t h, m, s;
-  static uint32_t next_sun_intensity_timestamp;
-  static uint32_t end_timestamp;
 
-  if (!cfg_data.is_alarm_enabled)
+  if (!is_alarm_enabled())
     return;
 
   if (is_setup_mode())
     return;
 
-  if (runtime_data.is_alarm_active)
+  s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
+  if (is_alarm_active())
   {
     // alarm is already in progress
-    h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-    m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-    if (h == runtime_data.alarm_end_time[H_POS])
+    // only handle alarm per minute basis
+    if (s == 0)
     {
-      if (m == runtime_data.alarm_end_time[M_POS])
+      h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+      if (h == runtime_data.alarm_end_time[H_POS])
       {
-        // finish alarm
-        runtime_data.is_alarm_active = false;
-        sun_set_intensity(cfg_data.sun_intensity_max);
+        m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+        if (m == runtime_data.alarm_end_time[M_POS])
+        {
+          // finish alarm
+          set_alarm_active(false);
+          sun_set_intensity(cfg_data.sun_intensity_max);
 
-        return;
+          return;
+        }
       }
     }
-
-    if (HAL_GetTick() >= next_sun_intensity_timestamp)
+    else if (HAL_GetTick() >= runtime_data.next_alarm_sun_intensity_timestamp)
     {
-      next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
-      sun_set_intensity(_get_next_alarm_sun_intensity());
+      runtime_data.next_alarm_sun_intensity_timestamp += _get_alarm_sun_intensity_msec_per_step();
+      runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(false);
+      sun_set_intensity(runtime_data.current_alarm_sun_intensity);
 
       return;
     }
@@ -194,63 +208,54 @@ void handle_alarm(void)
   else
   {
     // check if it is alarm time
-    s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
+    // only handle alarm per minute basis
     if (s == 0)
     {
       h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-      if (h == cfg_data.alarm_time[H_POS])
+      if (h == runtime_data.alarm_start_time[H_POS])
       {
         m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-        if (m == cfg_data.alarm_time[M_POS])
+        if (m == runtime_data.alarm_start_time[M_POS])
         {
           // its is wake up time!
-          runtime_data.is_alarm_active = true;
-          sun_set_intensity(cfg_data.sun_intensity_min);
-          sun_pwr_on();
+          runtime_data.next_alarm_sun_intensity_timestamp = HAL_GetTick() + _get_alarm_sun_intensity_msec_per_step();
+          runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(true);
+          sun_set_intensity(runtime_data.current_alarm_sun_intensity);
 
-          runtime_data.alarm_end_time[H_POS] = h;
-          runtime_data.alarm_end_time[M_POS] = m;
-          _manipulate_time(&runtime_data.alarm_end_time[H_POS],
-                           &runtime_data.alarm_end_time[M_POS],
-                           cfg_data.wakeup_time_min);
-          next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+          set_alarm_active(true);
+          sun_set_intensity(runtime_data.current_alarm_sun_intensity);
+          sun_pwr_on();
         }
       }
     }
   }
 }
 
-uint32_t _get_alarm_sun_intensity_sec_per_step(void)
+uint32_t _get_alarm_sun_intensity_msec_per_step(void)
 {
-  static uint16_t sec_per_step = 0;
+  static uint32_t msec_per_step = 0;
 
-  if (sec_per_step == 0)
+  if (msec_per_step == 0)
   {
-    sec_per_step = ((uint32_t)cfg_data.wakeup_time_min * 60) / ((uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min));
+    //60000 = 60 * 1000 (min -> sec -> sec -> msec)
+    msec_per_step = (((uint32_t)cfg_data.wakeup_time_min) * 60000) / ((uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min));
   }
 
-  return sec_per_step;
+  return msec_per_step;
 }
 
-uint32_t _get_next_alarm_intensity_timestamp(void)
-{
-  static uint32_t next_sun_intensity_timestamp = 0;
-
-  if (next_sun_intensity_timestamp == 0)
-  {
-    next_sun_intensity_timestamp = HAL_GetTick();
-  }
-
-  next_sun_intensity_timestamp += _get_alarm_sun_intensity_sec_per_step() * 1000; // ms -> sec
-
-  return next_sun_intensity_timestamp;
-}
-
-uint8_t _get_next_alarm_sun_intensity(void)
+uint8_t _get_next_alarm_sun_intensity(bool reset)
 {
   static uint8_t step_counter = 0;
 
-  step_counter++;
+  if (reset)
+  {
+    step_counter = 0;
+  }
+  else
+  {
+    step_counter++;
+  }
 
   return cfg_data.sun_intensity_min + step_counter;
 }
@@ -294,12 +299,6 @@ void set_alarm_state(bool is_enabled)
 {
   cfg_data.is_alarm_enabled = is_enabled;
 
-  if (is_enabled)
-  {
-    // discard any encoder increments until now
-    rot_enc_reset_count(&encoder);
-  }
-
   show_alarm_state();
 }
 
@@ -313,6 +312,12 @@ bool is_alarm_active(void)
   return runtime_data.is_alarm_active;
 }
 
+void set_alarm_active(bool is_active)
+{
+  runtime_data.is_alarm_active = is_active;
+  show_alarm_active_state(runtime_data.is_alarm_active);
+}
+
 // modify alarm settings in the runtime
 void _handle_alarm_time(void)
 {
@@ -321,6 +326,7 @@ void _handle_alarm_time(void)
   if (count != 0)
   {
     _manipulate_time(&cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], count);
+    _set_alarm_start_time();
 
     show_alarm_state();
   }

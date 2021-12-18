@@ -129,6 +129,27 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  /*
+  extern runtime_data_t runtime_data;
+  extern configuration_t cfg_data;
+
+  volatile uint8_t h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+  volatile uint8_t m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+  runtime_data.alarm_end_time[H_POS] = h;
+  runtime_data.alarm_end_time[M_POS] = m;
+  _manipulate_time(&runtime_data.alarm_end_time[H_POS],
+                   &runtime_data.alarm_end_time[M_POS],
+                   cfg_data.wakeup_time_min);
+  volatile uint32_t next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+  next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+  next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+  next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+  next_sun_intensity_timestamp = _get_next_alarm_intensity_timestamp();
+
+  volatile uint32_t sec_per_step = _get_alarm_sun_intensity_msec_per_step();
+  */
+
   while (1)
   {
     handle_buttons();

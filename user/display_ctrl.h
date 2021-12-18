@@ -16,6 +16,7 @@
 
 void show_time(void);
 void show_alarm_state(void);
+void show_alarm_active_state(bool is_active);
 void show_setup_item(sm_area_t sm_area, char *menu_str);
 
 void time_to_str(char *time_str, uint8_t h, uint8_t m, int8_t s);

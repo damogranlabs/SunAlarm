@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#define DEFAULT_WAKEUP_TIME_MIN 3
+#define DEFAULT_WAKEUP_TIME_MIN 1
 #define DEFAULT_SUN_INTENSITY_MIN 10
 #define DEFAULT_SUN_INTENSITY_MAX SUN_INTENSITY_MAX
 #define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
@@ -51,13 +51,17 @@ typedef struct runtime_data_t
   bool is_setup_mode;
   bool is_sun_enabled;
   bool is_alarm_active;
-  uint8_t alarm_end_time[2]; //  HM
+  uint8_t alarm_start_time[2]; //  HM
+  uint8_t alarm_end_time[2];   //  HM
+  uint8_t current_alarm_sun_intensity;
+  uint32_t next_alarm_sun_intensity_timestamp; //msec
 } runtime_data_t;
 
 void set_defaults(void);
 void set_alarm_state(bool is_enabled);
 bool is_alarm_enabled(void);
 bool is_alarm_active(void);
+void set_alarm_active(bool is_active);
 
 void set_setup_mode(bool is_enabled);
 bool is_setup_mode(void);
