@@ -1,9 +1,3 @@
-/*
- * setup_menu.c
- *
- *  Created on: Feb 14, 2021
- *      Author: domen
- */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -28,7 +22,6 @@ void _handle_setup_time(bool force_refresh, bool h_or_m);
 void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity);
 void _handle_setup_sun_manual_intensity(bool force_refresh);
 void _handle_setup_wakeup_time(bool force_refresh);
-void _handle_setup_music(bool force_refresh);
 
 void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
 
@@ -256,10 +249,6 @@ void _handle_setup(bool force_refresh)
     _handle_setup_sun_manual_intensity(force_refresh);
     break;
 
-  case SETUP_MUSIC:
-    _handle_setup_music(force_refresh);
-    break;
-
   case SETUP_TIME_H:
     _handle_setup_time(force_refresh, true);
     break;
@@ -330,11 +319,6 @@ void _handle_setup_wakeup_time(bool force_refresh)
     sprintf(time_str, "%d", cfg_data.wakeup_time_min);
     show_setup_item(sm_area, &time_str[0]);
   }
-}
-
-void _handle_setup_music(bool force_refresh)
-{
-  show_setup_item(sm_area, "<not yet>");
 }
 
 void _handle_setup_time(bool force_refresh, bool change_hours)

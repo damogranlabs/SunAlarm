@@ -1,10 +1,3 @@
-/*
- * sun_ctrl.c
- *
- *  Created on: 25 Apr 2021
- *      Author: domen
- */
-
 #include <stdbool.h>
 
 #include "stm32f0xx_ll_tim.h"

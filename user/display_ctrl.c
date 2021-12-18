@@ -37,7 +37,6 @@
 #define M_AREA_WAKEUP_TIME "Vzhod"
 #define M_AREA_SUN_INTENSITY "Sonce"
 #define M_AREA_SUN_MANUAL_INTENSITY "Luc"
-#define M_AREA_MUSIC "MUSIC"
 #define M_AREA_TIME "Ura"
 
 void _print_time(uint8_t X, uint8_t y, uint8_t h, uint8_t m, int8_t s);
@@ -83,10 +82,6 @@ void show_setup_item(sm_area_t sm_area, char *value_str)
   {
   case SETUP_WAKEUP_TIME:
     sprintf(setting_str, "@ %s (m):", M_AREA_WAKEUP_TIME);
-    break;
-
-  case SETUP_MUSIC:
-    sprintf(setting_str, "@ %s:", M_AREA_MUSIC);
     break;
 
   case SETUP_SUN_MIN_INTENSITY:

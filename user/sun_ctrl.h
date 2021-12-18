@@ -1,10 +1,3 @@
-/*
- * sun_ctrl.h
- *
- *  Created on: 25 Apr 2021
- *      Author: domen
- */
-
 #ifndef SUN_CTRL_H_
 #define SUN_CTRL_H_
 

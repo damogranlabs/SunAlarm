@@ -1,10 +1,3 @@
-/*
- * setup_menu.h
- *
- *  Created on: Feb 14, 2021
- *      Author: domen
- */
-
 #ifndef SRC_SETUP_MENU_H_
 #define SRC_SETUP_MENU_H_
 
@@ -27,7 +20,6 @@ typedef enum
   SETUP_SUN_MIN_INTENSITY,
   SETUP_SUN_MAX_INTENSITY,
   SETUP_SUN_DEFAULT_INTENSITY,
-  SETUP_MUSIC,
   SETUP_TIME_H,
   SETUP_TIME_M,
   SETUP_DONE
@@ -42,8 +34,6 @@ typedef struct configuration_t
   uint8_t sun_intensity_min;
   uint8_t sun_intensity_max;
   uint8_t sun_manual_intensity;
-
-  // TODO setup music
 } configuration_t;
 
 typedef struct runtime_data_t
