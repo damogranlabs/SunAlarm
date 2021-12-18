@@ -11,6 +11,10 @@
 
 #include "sun_ctrl.h"
 
+#include "setup_menu.h"
+
+extern configuration_t cfg_data;
+
 void sun_init(void)
 {
   LL_TIM_EnableAllOutputs(SUN_TIM);
@@ -38,6 +42,19 @@ void sun_pwr_on(void)
 void sun_pwr_off(void)
 {
   _sun_pwr_ctrl(false);
+}
+
+void sun_pwr_toggle(void)
+{
+  if (LL_TIM_IsEnabledCounter(SUN_TIM))
+  {
+    sun_pwr_off();
+  }
+  else
+  {
+    sun_set_intensity(cfg_data.sun_manual_intensity);
+    sun_pwr_on();
+  }
 }
 
 uint32_t get_sun_intensity_resolution(void)

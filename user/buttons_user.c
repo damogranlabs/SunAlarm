@@ -17,6 +17,7 @@
 #include "lcd.h"
 
 #include "setup_menu.h"
+#include "sun_ctrl.h"
 
 /**
  * @brief Low level call to get actual pin state.
@@ -66,7 +67,7 @@ void on_button_press(btn_cfg_t *btn_cfg)
     }
     else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
     {
-      toggle_sun_state();
+      sun_pwr_toggle();
     }
   }
 }

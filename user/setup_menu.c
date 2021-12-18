@@ -59,7 +59,6 @@ void _set_alarm_defaults(void)
 void set_defaults(void)
 {
   runtime_data.is_setup_mode = false;
-  runtime_data.is_sun_enabled = false;
   runtime_data.is_alarm_active = false;
   runtime_data.current_alarm_sun_intensity = cfg_data.sun_intensity_min;
   runtime_data.next_alarm_sun_intensity_timestamp = 0;
@@ -103,31 +102,6 @@ void set_setup_mode(bool is_enabled)
 bool is_setup_mode(void)
 {
   return runtime_data.is_setup_mode;
-}
-
-void set_sun_enabled(bool is_enabled)
-{
-  runtime_data.is_sun_enabled = is_enabled;
-}
-
-bool is_sun_enabled(void)
-{
-  return runtime_data.is_sun_enabled;
-}
-
-void toggle_sun_state(void)
-{
-  if (is_sun_enabled())
-  {
-    sun_pwr_off();
-    set_sun_enabled(false);
-  }
-  else
-  {
-    sun_set_intensity(cfg_data.sun_manual_intensity);
-    sun_pwr_on();
-    set_sun_enabled(true);
-  }
 }
 
 void update_settings(void)

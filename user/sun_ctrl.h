@@ -22,6 +22,7 @@ void sun_init(void);
 
 void sun_pwr_on(void);
 void sun_pwr_off(void);
+void sun_pwr_toggle(void);
 
 void sun_set_intensity(uint8_t intensity);
 void sun_set_intensity_precise(uint32_t intensity);

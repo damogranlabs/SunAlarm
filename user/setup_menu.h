@@ -49,7 +49,6 @@ typedef struct configuration_t
 typedef struct runtime_data_t
 {
   bool is_setup_mode;
-  bool is_sun_enabled;
   bool is_alarm_active;
   uint8_t alarm_start_time[2]; //  HM
   uint32_t current_alarm_sun_intensity;
@@ -64,10 +63,6 @@ void set_alarm_active(bool is_active);
 
 void set_setup_mode(bool is_enabled);
 bool is_setup_mode(void);
-
-bool is_sun_enabled(void);
-void set_sun_enabled(bool is_enabled);
-void toggle_sun_state(void);
 
 void handle_interactions(void);
 void handle_alarm(void);
