@@ -18,7 +18,6 @@
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
 
-void _show_alarm_state(void);
 void _set_alarm_defaults(void);
 void _set_alarm_start_time(void);
 void _handle_alarm_time(void);
