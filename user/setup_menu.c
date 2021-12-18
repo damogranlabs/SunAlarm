@@ -87,7 +87,7 @@ void set_setup_mode(bool is_enabled)
   else
   {
     // TODO save cfg settings to flash?
-    show_time();
+    show_time_and_alarm_active();
     show_alarm_state();
     sun_pwr_off();
 
@@ -318,7 +318,6 @@ bool is_alarm_active(void)
 void set_alarm_active(bool is_active)
 {
   runtime_data.is_alarm_active = is_active;
-  show_alarm_active_state(runtime_data.is_alarm_active);
 }
 
 // modify alarm settings in the runtime

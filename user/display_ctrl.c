@@ -18,13 +18,9 @@
 
 #define LCD_X_SIZE 15
 
-// time position
-#define T_Y 0
-#define T_X 1 // -1 = left aligned, 1 = right aligned.
+// time and alarm active status position
+#define T_A_Y 0
 
-// alarm current status (active) position
-#define A_ACTIVE_Y 0
-#define A_ACTIVE_X 0
 // alarm time info position
 #define A_SETTINGS_Y 1
 #define A_SETTINGS_X 0
@@ -48,7 +44,7 @@ void _print_time(uint8_t X, uint8_t y, uint8_t h, uint8_t m, int8_t s);
 
 extern configuration_t cfg_data;
 
-void show_time(void)
+void show_time_and_alarm_active(void)
 {
   uint8_t h, m, s = 0;
 
@@ -56,18 +52,13 @@ void show_time(void)
   m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
   s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
 
-  lcd_clear_area(T_Y, 0, LCD_X_SIZE);
-  if (T_X == -1)
+  lcd_clear_area(T_A_Y, 0, LCD_X_SIZE);
+  // show alarm active status on the far left, time on the far right
+  if (is_alarm_active())
   {
-    // left-aligned
-    _print_time(T_Y, 0, h, m, s);
+    lcd_print_str(T_A_Y, 0, "!");
   }
-  else
-  {
-    // right-aligned
-    // 8 == 'HH:MM:SS'
-    _print_time(T_Y, LCD_X_SIZE - 8 + 1, h, m, s);
-  }
+  _print_time(T_A_Y, LCD_X_SIZE - 8 + 1, h, m, s); // 8 == 'HH:MM:SS'
 }
 
 void show_alarm_state()
@@ -81,18 +72,6 @@ void show_alarm_state()
   else
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_OFF_TEXT);
-  }
-}
-
-void show_alarm_active_state(bool is_active)
-{
-  if (is_active)
-  {
-    lcd_print_str(A_ACTIVE_Y, A_ACTIVE_X, "!");
-  }
-  else
-  {
-    lcd_print_str(A_ACTIVE_Y, A_ACTIVE_X, " ");
   }
 }
 

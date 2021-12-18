@@ -174,7 +174,7 @@ void RTC_IRQHandler(void)
   /* USER CODE BEGIN RTC_IRQn 0 */
   if (!is_setup_mode())
   {
-    show_time();
+    show_time_and_alarm_active();
   }
   LL_RTC_ClearFlag_ALRA(RTC);
   LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_17);

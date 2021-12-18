@@ -46,24 +46,25 @@ btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg)
  */
 void on_button_press(btn_cfg_t *btn_cfg)
 {
-  if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
+  if (is_alarm_active())
   {
-    if (is_setup_mode())
-    {
-      update_settings();
-    }
-    else
-    {
-      set_alarm_state(!is_alarm_enabled());
-    }
+    set_alarm_active(false);
   }
-  else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
+  else
   {
-    if (is_alarm_active())
+    // use any button to cancel alarm
+    if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
     {
-      set_alarm_active(false);
+      if (is_setup_mode())
+      {
+        update_settings();
+      }
+      else
+      {
+        set_alarm_state(!is_alarm_enabled());
+      }
     }
-    else
+    else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
     {
       toggle_sun_state();
     }
