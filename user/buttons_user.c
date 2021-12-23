@@ -18,6 +18,7 @@
 
 #include "setup_menu.h"
 #include "sun_ctrl.h"
+#include "display_ctrl.h"
 
 /**
  * @brief Low level call to get actual pin state.
@@ -50,6 +51,7 @@ void on_button_press(btn_cfg_t *btn_cfg)
   if (is_alarm_active())
   {
     set_alarm_active(false);
+    ctrl_lcd_backlight(true, true);
   }
   else
   {
@@ -63,11 +65,31 @@ void on_button_press(btn_cfg_t *btn_cfg)
       else
       {
         set_alarm_state(!is_alarm_enabled());
+        ctrl_lcd_backlight(true, true);
       }
     }
     else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
     {
-      sun_pwr_toggle();
+      // use this button to only turn on LCD backlight (see time/alarm).
+      // Press again in this time to power on sun (manual intensity)
+      // Power off after next button press (LCd after timeout)
+      if (is_sun_enabled())
+      {
+        sun_pwr_off();
+        ctrl_lcd_backlight(true, true);
+      }
+      else
+      {
+        if (is_lcd_backlight_enabled())
+        {
+          sun_pwr_on_manual();
+          ctrl_lcd_backlight(true, false);
+        }
+        else
+        {
+          ctrl_lcd_backlight(true, true);
+        }
+      }
     }
   }
 }
@@ -80,8 +102,19 @@ void on_button_press(btn_cfg_t *btn_cfg)
  */
 void on_button_longpress(btn_cfg_t *btn_cfg)
 {
+  bool setup_mode = is_setup_mode();
+
   if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
   {
-    set_setup_mode(!is_setup_mode());
+    if (setup_mode)
+    {
+      ctrl_lcd_backlight(true, true);
+    }
+    else
+    {
+      ctrl_lcd_backlight(true, false);
+    }
+
+    set_setup_mode(!setup_mode);
   }
 }

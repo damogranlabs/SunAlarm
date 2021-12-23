@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "main.h"
+
+#include "stm32f0xx_hal_flash.h"
+
 #include "lcd.h"
 #include "buttons.h"
 #include "rot_enc.h"
 
-#include "main.h"
 #include "setup_menu.h"
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
@@ -31,11 +34,9 @@ uint32_t _get_next_alarm_sun_intensity(bool reset);
 sm_area_t sm_area;
 configuration_t cfg_data;
 runtime_data_t runtime_data;
-
 extern rot_enc_data_t encoder;
 
-void _clear_lcd_sm_area(void);
-void _clear_lcd_sm_value(void);
+#define CFG_DATA_FLASH_ADD 0x80003C00 //0x80005000
 
 void _set_alarm_defaults(void)
 {
@@ -294,6 +295,7 @@ void _handle_alarm_time(void)
     _set_alarm_start_time();
 
     show_alarm_state();
+    ctrl_lcd_backlight(true, true);
   }
 }
 
@@ -450,4 +452,77 @@ void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min)
 
   *h_ptr = (uint8_t)h;
   *m_ptr = (uint8_t)m;
+}
+
+void save_settings(void)
+{
+  uint8_t var_idx;
+  uint32_t *cfg_data_ptr = (uint32_t *)&cfg_data;
+  uint32_t flash_add = CFG_DATA_FLASH_ADD;
+
+  volatile uint8_t wrBuf[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
+
+  __disable_irq();
+  uint32_t flash_page_err = 0;
+  FLASH_EraseInitTypeDef pEraseInit = {0};
+  pEraseInit.TypeErase = FLASH_TYPEERASE_PAGES;
+  pEraseInit.PageAddress = CFG_DATA_FLASH_ADD;
+  pEraseInit.NbPages = 1;
+
+  while (__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != 0)
+  {
+  }
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
+
+  HAL_FLASH_Unlock();
+  HAL_FLASHEx_Erase(&pEraseInit, &flash_page_err);
+  HAL_FLASH_Lock();
+
+  while (__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != 0)
+  {
+  }
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
+
+  volatile HAL_StatusTypeDef status;
+  status = HAL_FLASH_Unlock();
+  // LL_FLASH_SetLatency(LL_FLASH_LATENCY_0);
+  // LL_FLASH_DisablePrefetch();
+  // HAL_FLASH_OB_Unlock();
+  //for (uint32_t i = 0; i < 5; i++)
+  //{
+  //  HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, flash_add, ((uint8_t *)wrBuf)[i]);
+  //  flash_add++;
+  //}
+
+  while (__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != 0)
+  {
+  }
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
+
+  uint16_t data = 11234;
+
+  HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, flash_add, &data);
+  HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flash_add + 4, *cfg_data_ptr + 4);
+  HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flash_add + 8, *cfg_data_ptr + 8);
+  HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flash_add + 12, *cfg_data_ptr + 12);
+
+  for (var_idx = 0; var_idx < sizeof(cfg_data); var_idx += 4, cfg_data_ptr++, flash_add += 4)
+  {
+    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flash_add, *cfg_data_ptr);
+  }
+  HAL_FLASH_Lock();
+
+  __enable_irq();
+}
+
+void read_settings(void)
+{
+  uint8_t var_idx;
+  uint32_t *cfg_data_ptr = (uint32_t *)&cfg_data;
+  uint32_t flash_address = CFG_DATA_FLASH_ADD;
+
+  for (var_idx = 0; var_idx < sizeof(cfg_data); var_idx += 4, cfg_data_ptr++, flash_address += 4)
+  {
+    *cfg_data_ptr = *(uint32_t *)flash_address;
+  }
 }

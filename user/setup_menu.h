@@ -59,4 +59,7 @@ void handle_alarm(void);
 
 void update_settings(void);
 
+void write_settings(void);
+void read_settings(void);
+
 #endif /* SRC_SETUP_MENU_H_ */

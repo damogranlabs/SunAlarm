@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "stm32f0xx_ll_rtc.h"
+#include "stm32f0xx_ll_gpio.h"
 
 #include "lcd.h"
 
@@ -42,6 +43,8 @@
 void _print_time(uint8_t X, uint8_t y, uint8_t h, uint8_t m, int8_t s);
 
 extern configuration_t cfg_data;
+
+static uint32_t lcd_off_timestamp;
 
 void show_time_and_alarm_active(void)
 {
@@ -109,6 +112,44 @@ void show_setup_item(sm_area_t sm_area, char *value_str)
   lcd_clear();
   lcd_print_str(M_AREA_Y, M_AREA_X, setting_str);
   lcd_print_str(M_VALUE_Y, M_VALUE_X, value_str);
+}
+
+void handle_lcd_backlight(void)
+{
+  if (lcd_off_timestamp != 0)
+  {
+    if (HAL_GetTick() > lcd_off_timestamp)
+    {
+      ctrl_lcd_backlight(false, false);
+      lcd_off_timestamp = 0;
+    }
+  }
+}
+
+void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
+{
+  if (is_enabled)
+  {
+    LL_GPIO_ResetOutputPin(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
+    if (auto_backlight)
+    {
+      lcd_off_timestamp = HAL_GetTick() + LCD_BACKLIGHT_OFF_DELAY_MS;
+    }
+    else
+    {
+      lcd_off_timestamp = 0;
+    }
+  }
+  else
+  {
+    LL_GPIO_SetOutputPin(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
+    lcd_off_timestamp = 0;
+  }
+}
+
+bool is_lcd_backlight_enabled(void)
+{
+  return !LL_GPIO_IsOutputPinSet(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
 }
 
 void time_to_str(char *time_str, uint8_t h, uint8_t m, int8_t s)

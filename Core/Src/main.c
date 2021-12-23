@@ -104,26 +104,11 @@ int main(void)
 
   lcd_init(2, 16);
   lcd_clear();
-
-  /*
-  LL_RTC_EnterInitMode(RTC);
-  LL_RTC_TIME_Config(RTC,
-                     LL_RTC_TIME_FORMAT_AM_OR_24,
-                     __LL_RTC_CONVERT_BIN2BCD(19),
-                     __LL_RTC_CONVERT_BIN2BCD(1),
-                     __LL_RTC_CONVERT_BIN2BCD(0));
-  LL_RTC_ExitInitMode(RTC);
-  LL_RTC_WaitForSynchro(RTC);
-  */
-  //LL_RTC_EnableWriteProtection(RTC);
-  //while (!LL_RTC_IsActiveFlag_RS(RTC))
-  //{
-  //};
-
-  sun_init();
+  ctrl_lcd_backlight(true, true);
 
   // TODO load cfg data from flash
   set_defaults();
+  sun_init();
   show_alarm_state();
   /* USER CODE END 2 */
 
@@ -148,6 +133,9 @@ int main(void)
   sec_per_step = _get_alarm_sun_intensity_msec_per_step();
   */
 
+  // save_settings();
+  // read_settings();
+
   while (1)
   {
     handle_buttons();
@@ -155,6 +143,8 @@ int main(void)
     handle_interactions();
 
     handle_alarm();
+
+    handle_lcd_backlight();
 
     /* USER CODE END WHILE */
 

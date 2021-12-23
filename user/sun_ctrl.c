@@ -36,18 +36,15 @@ void sun_pwr_off(void)
 {
   _sun_pwr_ctrl(false);
 }
-
-void sun_pwr_toggle(void)
+void sun_pwr_on_manual(void)
 {
-  if (LL_TIM_IsEnabledCounter(SUN_TIM))
-  {
-    sun_pwr_off();
-  }
-  else
-  {
-    sun_set_intensity(cfg_data.sun_manual_intensity);
-    sun_pwr_on();
-  }
+  sun_set_intensity(cfg_data.sun_manual_intensity);
+  sun_pwr_on();
+}
+
+bool is_sun_enabled(void)
+{
+  return (bool)LL_TIM_IsEnabledCounter(SUN_TIM);
 }
 
 uint32_t get_sun_intensity_resolution(void)
