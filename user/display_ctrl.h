@@ -13,7 +13,7 @@
 #include "setup_menu.h"
 
 #define TIME_STR_SIZE 8 // HH:MM:SS
-#define LCD_BACKLIGHT_OFF_DELAY_MS 1000
+#define LCD_BACKLIGHT_OFF_DELAY_MS 4000
 
 void show_time_and_alarm_active(void);
 
