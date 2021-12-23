@@ -24,7 +24,8 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -42,28 +43,28 @@ extern "C" {
 #include "stm32f0xx_ll_pwr.h"
 #include "stm32f0xx_ll_dma.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+  /* Private includes ----------------------------------------------------------*/
+  /* USER CODE BEGIN Includes */
 
-/* USER CODE END Includes */
+  /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+  /* Exported types ------------------------------------------------------------*/
+  /* USER CODE BEGIN ET */
 
-/* USER CODE END ET */
+  /* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+  /* Exported constants --------------------------------------------------------*/
+  /* USER CODE BEGIN EC */
 
-/* USER CODE END EC */
+  /* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+  /* Exported macro ------------------------------------------------------------*/
+  /* USER CODE BEGIN EM */
 
-/* USER CODE END EM */
+  /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+  /* Exported functions prototypes ---------------------------------------------*/
+  void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -81,10 +82,6 @@ void Error_Handler(void);
 #define OUT_OD_1_GPIO_Port GPIOA
 #define OUT_OD_2_Pin LL_GPIO_PIN_2
 #define OUT_OD_2_GPIO_Port GPIOA
-#define MOTOR_2_Pin LL_GPIO_PIN_0
-#define MOTOR_2_GPIO_Port GPIOB
-#define MOTOR_1_Pin LL_GPIO_PIN_1
-#define MOTOR_1_GPIO_Port GPIOB
 #define LCD_RS_Pin LL_GPIO_PIN_8
 #define LCD_RS_GPIO_Port GPIOA
 #define PIR3_Pin LL_GPIO_PIN_9
@@ -107,18 +104,21 @@ void Error_Handler(void);
 #define LCD_D6_GPIO_Port GPIOB
 #define LCD_D7_Pin LL_GPIO_PIN_7
 #define LCD_D7_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
+  /* USER CODE BEGIN Private defines */
 
 #define B_LA_CTRL_Pin LIM_SW1_Pin
 #define B_LA_CTRL_Port LIM_SW1_GPIO_Port
 
-#define B_SETUP_Pin B0_Pin
-#define B_SETUP_Port B0_GPIO_Port
+#define B_SETUP_Pin LIM_SW2_Pin
+#define B_SETUP_Port LIM_SW2_GPIO_Port
 
 #define SUN_OUT_Pin PIR2_Pin
 #define SUN_OUT_Port PIR2_GPIO_Port
 
-/* USER CODE END Private defines */
+#define LCD_BACKLIGHT_Pin PIR1_Pin
+#define LCD_BACKLIGHT_Port PIR1_GPIO_Port
+
+  /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

@@ -56,12 +56,6 @@ void MX_GPIO_Init(void)
   LL_GPIO_SetOutputPin(OUT_OD_2_GPIO_Port, OUT_OD_2_Pin);
 
   /**/
-  LL_GPIO_ResetOutputPin(MOTOR_2_GPIO_Port, MOTOR_2_Pin);
-
-  /**/
-  LL_GPIO_ResetOutputPin(MOTOR_1_GPIO_Port, MOTOR_1_Pin);
-
-  /**/
   LL_GPIO_ResetOutputPin(LCD_RS_GPIO_Port, LCD_RS_Pin);
 
   /**/
@@ -127,22 +121,6 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(OUT_OD_2_GPIO_Port, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = MOTOR_2_Pin;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(MOTOR_2_GPIO_Port, &GPIO_InitStruct);
-
-  /**/
-  GPIO_InitStruct.Pin = MOTOR_1_Pin;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(MOTOR_1_GPIO_Port, &GPIO_InitStruct);
-
-  /**/
   GPIO_InitStruct.Pin = LCD_RS_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_MEDIUM;
@@ -153,7 +131,7 @@ void MX_GPIO_Init(void)
   /**/
   GPIO_InitStruct.Pin = PIR3_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
   LL_GPIO_Init(PIR3_GPIO_Port, &GPIO_InitStruct);
 
   /**/
