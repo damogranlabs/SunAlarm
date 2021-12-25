@@ -5,6 +5,7 @@
 
 #include "main.h"
 
+#include "stm32f0xx_ll_rtc.h"
 #include "stm32f0xx_hal_flash.h"
 
 #include "lcd.h"
@@ -68,9 +69,12 @@ void set_setup_mode(bool is_enabled)
     sm_area = SETUP_WAKEUP_TIME;
     rot_enc_reset_count(&encoder);
 
+    // TODO
+    //LL_RTC_DisableWriteProtection(RTC);
     LL_RTC_WaitForSynchro(RTC);
     cfg_data.hms_time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
     cfg_data.hms_time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+    //LL_RTC_EnableWriteProtection(RTC);
 
     sun_pwr_on();
 
@@ -83,10 +87,12 @@ void set_setup_mode(bool is_enabled)
     show_alarm_state();
     sun_pwr_off();
 
+    LL_RTC_DisableWriteProtection(RTC);
     LL_RTC_EnterInitMode(RTC);
     LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[H_POS]));
     LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[M_POS]));
     LL_RTC_ExitInitMode(RTC);
+    LL_RTC_EnableWriteProtection(RTC);
 
     _set_alarm_start_time();
   }
