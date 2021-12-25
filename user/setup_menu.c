@@ -83,8 +83,6 @@ void set_setup_mode(bool is_enabled)
   else
   {
     // TODO save cfg settings to flash?
-    show_time_and_alarm_active();
-    show_alarm_state();
     sun_pwr_off();
 
     LL_RTC_DisableWriteProtection(RTC);
@@ -95,6 +93,8 @@ void set_setup_mode(bool is_enabled)
     LL_RTC_EnableWriteProtection(RTC);
 
     _set_alarm_start_time();
+
+    show_default();
   }
 }
 

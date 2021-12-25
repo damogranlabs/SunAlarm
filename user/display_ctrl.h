@@ -15,7 +15,11 @@
 #define TIME_STR_SIZE 8 // HH:MM:SS
 #define LCD_BACKLIGHT_OFF_DELAY_MS 4000
 
+void show_default(void);
+
 void show_time_and_alarm_active(void);
+void show_time(void);
+void show_alarm_active(void);
 
 void show_alarm_state(void);
 void show_setup_item(sm_area_t sm_area, char *menu_str);

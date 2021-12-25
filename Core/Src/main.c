@@ -51,7 +51,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+volatile bool rtc_event = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +106,20 @@ int main(void)
   lcd_clear();
   ctrl_lcd_backlight(true, true);
 
+  /*
+  ctrl_lcd_backlight(true, false);
+  uint32_t count = 0;
+  while (1)
+  {
+    count = rot_enc_get_count(&encoder);
+    if (count)
+    {
+      lcd_clear_area(0, 0, 3);
+      lcd_print_int(0, 0, rot_enc_get_abs_count(&encoder));
+    }
+  }
+  */
+
   // TODO load cfg data from flash
   set_defaults();
   sun_init();
@@ -138,6 +152,17 @@ int main(void)
 
   while (1)
   {
+    if (rtc_event)
+    {
+      if (!is_setup_mode())
+      {
+        //show time();
+        show_time_and_alarm_active();
+      }
+
+      rtc_event = false;
+    }
+
     handle_buttons();
 
     handle_interactions();
@@ -229,5 +254,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

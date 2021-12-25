@@ -46,6 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 extern rot_enc_data_t encoder;
+extern volatile bool rtc_event;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -173,10 +174,8 @@ void EXTI0_1_IRQHandler(void)
 void RTC_IRQHandler(void)
 {
   /* USER CODE BEGIN RTC_IRQn 0 */
-  if (!is_setup_mode())
-  {
-    show_time_and_alarm_active();
-  }
+  rtc_event = true;
+
   LL_RTC_ClearFlag_ALRA(RTC);
   LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_17);
   /* USER CODE END RTC_IRQn 0 */
@@ -187,4 +186,3 @@ void RTC_IRQHandler(void)
 }
 
 /* USER CODE END 1 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

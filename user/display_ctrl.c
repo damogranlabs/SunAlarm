@@ -46,20 +46,42 @@ extern configuration_t cfg_data;
 
 static uint32_t lcd_off_timestamp;
 
+void show_default(void)
+{
+  // this function show displays state on setup menu exit
+  lcd_clear();
+
+  show_time();
+  show_alarm_active();
+  show_alarm_state();
+}
+
 void show_time_and_alarm_active(void)
 {
+  show_alarm_active();
+  show_time();
+}
+
+void show_alarm_active(void)
+{
+  // show alarm active status on the far left, time on the far right
+  lcd_clear_area(T_A_Y, 0, 1);
+  if (is_alarm_active())
+  {
+    lcd_print_str(T_A_Y, 0, "!");
+  }
+}
+
+void show_time(void)
+{
+  // show alarm active status on the far left, time on the far right
   uint8_t h, m, s = 0;
 
   h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
   m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
   s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
 
-  lcd_clear_area(T_A_Y, 0, LCD_X_SIZE);
-  // show alarm active status on the far left, time on the far right
-  if (is_alarm_active())
-  {
-    lcd_print_str(T_A_Y, 0, "!");
-  }
+  lcd_clear_area(T_A_Y, LCD_X_SIZE - TIME_STR_SIZE, LCD_X_SIZE);
   _print_time(T_A_Y, LCD_X_SIZE - 8 + 1, h, m, s); // 8 == 'HH:MM:SS'
 }
 
@@ -69,7 +91,7 @@ void show_alarm_state()
   if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
-    _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT) + 1, cfg_data.alarm_time[H_POS], cfg_data.alarm_time[M_POS], -1);
+    _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT), cfg_data.alarm_time[H_POS], cfg_data.alarm_time[M_POS], -1);
   }
   else
   {
