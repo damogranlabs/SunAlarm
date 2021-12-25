@@ -364,8 +364,6 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
       cfg_data.hms_time[M_POS] = abs(count);
     }
 
-    //_manipulate_time(&cfg_data.hms_time[H_POS], &cfg_data.hms_time[M_POS], count);
-
     time_to_str(time_str, cfg_data.hms_time[H_POS], cfg_data.hms_time[M_POS], -1);
     show_setup_item(sm_area, time_str);
   }
