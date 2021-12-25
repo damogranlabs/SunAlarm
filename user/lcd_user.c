@@ -13,6 +13,9 @@
 /* Includes -------------------------------------*/
 #include "lcd_user.h"
 
+#include "system_stm32f0xx.h"
+#include "stm32f0xx_hal.h"
+
 #pragma GCC push_options
 #pragma GCC optimize("O0")
 /**
