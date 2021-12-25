@@ -28,7 +28,7 @@ typedef enum
 typedef struct configuration_t
 {
   bool is_alarm_enabled;
-  uint8_t hms_time[3];   //  HMS
+  uint8_t time[2];       //  HM
   uint8_t alarm_time[2]; //  HM
   uint8_t wakeup_time_min;
   uint8_t sun_intensity_min;

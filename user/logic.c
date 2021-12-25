@@ -72,8 +72,8 @@ void set_setup_mode(bool is_enabled)
     // TODO
     //LL_RTC_DisableWriteProtection(RTC);
     LL_RTC_WaitForSynchro(RTC);
-    cfg_data.hms_time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-    cfg_data.hms_time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
+    cfg_data.time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
+    cfg_data.time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
     //LL_RTC_EnableWriteProtection(RTC);
 
     sun_pwr_on();
@@ -87,8 +87,8 @@ void set_setup_mode(bool is_enabled)
 
     LL_RTC_DisableWriteProtection(RTC);
     LL_RTC_EnterInitMode(RTC);
-    LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[H_POS]));
-    LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.hms_time[M_POS]));
+    LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.time[H_POS]));
+    LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.time[M_POS]));
     LL_RTC_ExitInitMode(RTC);
     LL_RTC_EnableWriteProtection(RTC);
 
@@ -339,7 +339,7 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
   {
     if (change_hours)
     {
-      count += cfg_data.hms_time[H_POS];
+      count += cfg_data.time[H_POS];
       while (count > 23)
       {
         count -= 24;
@@ -348,11 +348,11 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
       {
         count += 24;
       }
-      cfg_data.hms_time[H_POS] = abs(count);
+      cfg_data.time[H_POS] = abs(count);
     }
     else
     {
-      count += cfg_data.hms_time[M_POS];
+      count += cfg_data.time[M_POS];
       while (count > 59)
       {
         count -= 60;
@@ -361,10 +361,10 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
       {
         count += 60;
       }
-      cfg_data.hms_time[M_POS] = abs(count);
+      cfg_data.time[M_POS] = abs(count);
     }
 
-    time_to_str(time_str, cfg_data.hms_time[H_POS], cfg_data.hms_time[M_POS], -1);
+    time_to_str(time_str, cfg_data.time[H_POS], cfg_data.time[M_POS], -1);
     show_setup_item(sm_area, time_str);
   }
 }
