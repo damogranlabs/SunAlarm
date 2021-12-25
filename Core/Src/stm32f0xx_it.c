@@ -25,7 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "rot_enc.h"
 #include "display_ctrl.h"
-#include "setup_menu.h"
+#include "logic.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

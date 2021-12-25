@@ -16,7 +16,7 @@
 // TODO
 #include "lcd.h"
 
-#include "setup_menu.h"
+#include "logic.h"
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
 

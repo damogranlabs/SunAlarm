@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-#include "setup_menu.h"
+#include "logic.h"
 
 #define TIME_STR_SIZE 8 // HH:MM:SS
 #define LCD_BACKLIGHT_OFF_DELAY_MS 4000

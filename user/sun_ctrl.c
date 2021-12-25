@@ -4,7 +4,7 @@
 
 #include "sun_ctrl.h"
 
-#include "setup_menu.h"
+#include "logic.h"
 
 extern configuration_t cfg_data;
 

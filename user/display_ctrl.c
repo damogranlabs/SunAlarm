@@ -14,7 +14,7 @@
 #include "lcd.h"
 
 #include "main.h"
-#include "setup_menu.h"
+#include "logic.h"
 #include "display_ctrl.h"
 
 #define LCD_X_SIZE 15
