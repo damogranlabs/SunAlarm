@@ -339,9 +339,32 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
   {
     if (change_hours)
     {
-      count *= 60;
+      count += cfg_data.hms_time[H_POS];
+      while (count > 23)
+      {
+        count -= 24;
+      }
+      while (count < 0)
+      {
+        count += 24;
+      }
+      cfg_data.hms_time[H_POS] = abs(count);
     }
-    _manipulate_time(&cfg_data.hms_time[H_POS], &cfg_data.hms_time[M_POS], count);
+    else
+    {
+      count += cfg_data.hms_time[M_POS];
+      while (count > 59)
+      {
+        count -= 60;
+      }
+      while (count < 0)
+      {
+        count += 60;
+      }
+      cfg_data.hms_time[M_POS] = abs(count);
+    }
+
+    //_manipulate_time(&cfg_data.hms_time[H_POS], &cfg_data.hms_time[M_POS], count);
 
     time_to_str(time_str, cfg_data.hms_time[H_POS], cfg_data.hms_time[M_POS], -1);
     show_setup_item(sm_area, time_str);
