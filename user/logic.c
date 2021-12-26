@@ -7,6 +7,7 @@
 
 #include "stm32f0xx_ll_rtc.h"
 #include "stm32f0xx_hal_flash.h"
+#include "rtc.h"
 
 #include "lcd.h"
 #include "buttons.h"
@@ -69,13 +70,9 @@ void set_setup_mode(bool is_enabled)
     sm_area = SETUP_WAKEUP_TIME;
     rot_enc_reset_count(&encoder);
 
-    // TODO
-    //LL_RTC_DisableWriteProtection(RTC);
-    LL_RTC_WaitForSynchro(RTC);
-    cfg_data.time[H_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-    cfg_data.time[M_POS] = (uint8_t)__LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-    //LL_RTC_EnableWriteProtection(RTC);
+    get_current_time(&cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
 
+    sun_set_intensity(cfg_data.sun_intensity_min);
     sun_pwr_on();
 
     _handle_setup(true);

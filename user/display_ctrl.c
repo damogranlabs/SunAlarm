@@ -8,8 +8,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "stm32f0xx_ll_rtc.h"
 #include "stm32f0xx_ll_gpio.h"
+
+#include "rtc.h"
 
 #include "lcd.h"
 
@@ -77,9 +78,7 @@ void show_time(void)
   // show alarm active status on the far left, time on the far right
   uint8_t h, m, s = 0;
 
-  h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-  m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-  s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
+  get_current_time(&h, &m, &s);
 
   lcd_clear_area(T_A_Y, LCD_X_SIZE - TIME_STR_SIZE, LCD_X_SIZE);
   _print_time(T_A_Y, LCD_X_SIZE - 8 + 1, h, m, s); // 8 == 'HH:MM:SS'
