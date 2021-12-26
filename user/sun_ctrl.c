@@ -11,12 +11,15 @@ extern configuration_t cfg_data;
 void sun_init(void)
 {
   LL_TIM_EnableAllOutputs(SUN_TIM);
+  LL_TIM_SetCounter(SUN_TIM, 0);
+  sun_set_intensity(cfg_data.sun_manual_intensity);
 }
 
 void _sun_pwr_ctrl(bool state)
 {
   if (state)
   {
+    LL_TIM_SetCounter(SUN_TIM, 0);
     LL_TIM_CC_EnableChannel(SUN_TIM, SUN_TIM_CH);
     LL_TIM_EnableCounter(SUN_TIM);
   }
