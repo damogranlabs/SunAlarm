@@ -44,29 +44,22 @@ void MX_RTC_Init(void)
   /** Initialize RTC and set the Time and Date
   */
   RTC_InitStruct.HourFormat = LL_RTC_HOURFORMAT_24HOUR;
-  RTC_InitStruct.AsynchPrescaler = 123; // 127; for 994ms, 124 for 1002
-  RTC_InitStruct.SynchPrescaler = 329;  //  317; for 994ms, 327 for 1002
+  RTC_InitStruct.AsynchPrescaler = 123;
+  RTC_InitStruct.SynchPrescaler = 329;
   LL_RTC_Init(RTC, &RTC_InitStruct);
-  //LL_RTC_SetAsynchPrescaler(RTC, 124); //127
-  //LL_RTC_SetSynchPrescaler(RTC, 319);  //311
+  LL_RTC_SetAsynchPrescaler(RTC, 123);
+  LL_RTC_SetSynchPrescaler(RTC, 329);
   /* USER CODE BEGIN RTC_Init 2 */
-  //NOTE: at this settings:
-  //RTC_InitStruct.AsynchPrescaler = 123;
-  //RTC_InitStruct.SynchPrescaler = 329;
-  //... and this specific HW at room temperature, socend is about 30us short.
-  // That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
+
+  //NOTE: settings can be set in rtc.h file
+  LL_RTC_SetAsynchPrescaler(RTC, RTC_ASYNCHPRESCALER);
+  LL_RTC_SetSynchPrescaler(RTC, RTC_SYNCHPRESCALER);
+
   LL_RTC_DisableWriteProtection(RTC);
   if (LL_RTC_WaitForSynchro(RTC) == ERROR)
   {
     Error_Handler();
   }
-
-  /*
-  while (LL_RTC_IsActiveFlag_RECALP(RTC) == 1)
-  {
-  }
-  LL_RTC_CAL_SetMinus(RTC, 70);
-  */
 
   // interrupt on 1 second
   LL_EXTI_InitTypeDef EXTI_InitStruct = {0};

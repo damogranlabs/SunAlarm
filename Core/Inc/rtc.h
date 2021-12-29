@@ -29,11 +29,19 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-  /* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
 
-  /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-  /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
+
+// RTC prescaller settings to get 1 second as precise as possible
+// Nejc board, first SunAlarm ever: this specific HW at room temperature, each second is about 30us short.
+// That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
+#define RTC_ASYNCHPRESCALER 123
+#define RTC_SYNCHPRESCALER 329
+
+  // TODO modify defines according to your HW.
 
   /* USER CODE END Private defines */
 
