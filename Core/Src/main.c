@@ -106,20 +106,6 @@ int main(void)
   lcd_clear();
   ctrl_lcd_backlight(true, true);
 
-  /*
-  ctrl_lcd_backlight(true, false);
-  uint32_t count = 0;
-  while (1)
-  {
-    count = rot_enc_get_count(&encoder);
-    if (count)
-    {
-      lcd_clear_area(0, 0, 3);
-      lcd_print_int(0, 0, rot_enc_get_abs_count(&encoder));
-    }
-  }
-  */
-
   // TODO load cfg data from flash
   set_defaults();
   sun_init();
@@ -128,28 +114,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  set_new_time(23, 59, 57);
 
-  /*
-  extern runtime_data_t runtime_data;
-  extern configuration_t cfg_data;
-
-  volatile uint8_t h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
-  volatile uint8_t m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
-  volatile uint32_t next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(true);
-  next_sun_intensity_timestamp = _get_next_alarm_sun_intensity(false);
-
-  volatile uint32_t sec_per_step = _get_alarm_sun_intensity_msec_per_step();
-  sec_per_step = _get_alarm_sun_intensity_msec_per_step();
-  */
+  show_time();
 
   // save_settings();
   // read_settings();
-
   while (1)
   {
     if (rtc_event)

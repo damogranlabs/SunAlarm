@@ -60,3 +60,4 @@ Module.symvers
 Mkfile.old
 dkms.conf
 dm00226326-using-the-hardware-realtime-clock-rtc-and-the-tamper-management-unit-tamp-with-stm32-microcontrollers-stmicroelectronics.pdf
+.vscode/.cortex-debug.peripherals.state.json

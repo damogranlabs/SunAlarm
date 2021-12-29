@@ -44,18 +44,29 @@ void MX_RTC_Init(void)
   /** Initialize RTC and set the Time and Date
   */
   RTC_InitStruct.HourFormat = LL_RTC_HOURFORMAT_24HOUR;
-  RTC_InitStruct.AsynchPrescaler = 127;
-  RTC_InitStruct.SynchPrescaler = 311;
+  RTC_InitStruct.AsynchPrescaler = 123; // 127; for 994ms, 124 for 1002
+  RTC_InitStruct.SynchPrescaler = 329;  //  317; for 994ms, 327 for 1002
   LL_RTC_Init(RTC, &RTC_InitStruct);
-  LL_RTC_SetAsynchPrescaler(RTC, 127);
-  LL_RTC_SetSynchPrescaler(RTC, 311);
+  //LL_RTC_SetAsynchPrescaler(RTC, 124); //127
+  //LL_RTC_SetSynchPrescaler(RTC, 319);  //311
   /* USER CODE BEGIN RTC_Init 2 */
+  //NOTE: at this settings:
+  //RTC_InitStruct.AsynchPrescaler = 123;
+  //RTC_InitStruct.SynchPrescaler = 329;
+  //... and this specific HW at room temperature, socend is about 30us short.
+  // That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
   LL_RTC_DisableWriteProtection(RTC);
-
   if (LL_RTC_WaitForSynchro(RTC) == ERROR)
   {
     Error_Handler();
   }
+
+  /*
+  while (LL_RTC_IsActiveFlag_RECALP(RTC) == 1)
+  {
+  }
+  LL_RTC_CAL_SetMinus(RTC, 70);
+  */
 
   // interrupt on 1 second
   LL_EXTI_InitTypeDef EXTI_InitStruct = {0};
@@ -64,7 +75,10 @@ void MX_RTC_Init(void)
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
   EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING;
   EXTI_InitStruct.LineCommand = ENABLE;
-  LL_EXTI_Init(&EXTI_InitStruct);
+  if (LL_EXTI_Init(&EXTI_InitStruct) == ERROR)
+  {
+    Error_Handler();
+  }
 
   NVIC_ClearPendingIRQ(RTC_IRQn);
   NVIC_SetPriority(RTC_IRQn, 0);
@@ -76,9 +90,7 @@ void MX_RTC_Init(void)
   LL_RTC_EnableIT_ALRA(RTC);
   LL_RTC_ALMA_Enable(RTC);
 
-  //LL_RTC_EnableShadowRegBypass(RTC);
   LL_RTC_EnableWriteProtection(RTC);
-
   /* USER CODE END RTC_Init 2 */
 }
 
@@ -94,4 +106,18 @@ void get_current_time(uint8_t *h, uint8_t *m, uint8_t *s)
   LL_RTC_ReadReg(RTC, DR);
 }
 
+void set_new_time(uint8_t h, uint8_t m, uint8_t s)
+{
+  LL_RTC_TimeTypeDef RTC_TimeStruct = {0};
+
+  RTC_TimeStruct.TimeFormat = LL_RTC_TIME_FORMAT_AM_OR_24;
+  RTC_TimeStruct.Hours = h;
+  RTC_TimeStruct.Minutes = m;
+  RTC_TimeStruct.Seconds = s;
+
+  if (LL_RTC_TIME_Init(RTC, LL_RTC_FORMAT_BIN, &RTC_TimeStruct) == ERROR)
+  {
+    Error_Handler();
+  }
+}
 /* USER CODE END 1 */

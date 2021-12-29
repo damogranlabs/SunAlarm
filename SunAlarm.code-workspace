@@ -27,7 +27,13 @@
             "display_ctrl.h": "c",
             "rot_enc.h": "c",
             "rot_enc_user.h": "c",
-            "stdint.h": "c"
+            "stdint.h": "c",
+            "stm32f0xx_hal_flash.h": "c",
+            "stm32f0xx_hal_flash_ex.h": "c",
+            "stm32f0xx_hal_def.h": "c",
+            "stm32f0xx.h": "c",
+            "stm32f0xx_hal_conf.h": "c",
+            "lcd_user.h": "c"
         },
         "cortex-debug.armToolchainPath": "C:/GNU_Arm_Embedded_Toolchain_10.3-2021.10/bin/",
         "cortex-debug.openocdPath": "C:/xpack-openocd-0.11.0-2/bin/openocd.exe",

@@ -5,7 +5,6 @@
 
 #include "main.h"
 
-#include "stm32f0xx_ll_rtc.h"
 #include "stm32f0xx_hal_flash.h"
 #include "rtc.h"
 
@@ -82,12 +81,7 @@ void set_setup_mode(bool is_enabled)
     // TODO save cfg settings to flash?
     sun_pwr_off();
 
-    LL_RTC_DisableWriteProtection(RTC);
-    LL_RTC_EnterInitMode(RTC);
-    LL_RTC_TIME_SetHour(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.time[H_POS]));
-    LL_RTC_TIME_SetMinute(RTC, __LL_RTC_CONVERT_BIN2BCD(cfg_data.time[M_POS]));
-    LL_RTC_ExitInitMode(RTC);
-    LL_RTC_EnableWriteProtection(RTC);
+    set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
 
     _set_alarm_start_time();
 
@@ -145,17 +139,16 @@ void handle_alarm(void)
   if (is_setup_mode())
     return;
 
-  s = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetSecond(RTC));
+  get_current_time(&h, &m, &s);
+
   if (is_alarm_active())
   {
     // alarm is already in progress
     // only handle alarm per minute basis
     if (s == 0)
     {
-      h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
       if (h == cfg_data.alarm_time[H_POS])
       {
-        m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
         if (m == cfg_data.alarm_time[M_POS])
         {
           // finish alarm
@@ -181,10 +174,8 @@ void handle_alarm(void)
     // only handle alarm per minute basis
     if (s == 0)
     {
-      h = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetHour(RTC));
       if (h == runtime_data.alarm_start_time[H_POS])
       {
-        m = __LL_RTC_CONVERT_BCD2BIN(LL_RTC_TIME_GetMinute(RTC));
         if (m == runtime_data.alarm_start_time[M_POS])
         {
           // its is wake up time!

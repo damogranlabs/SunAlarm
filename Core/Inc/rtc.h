@@ -41,6 +41,7 @@ extern "C"
 
   /* USER CODE BEGIN Prototypes */
   void get_current_time(uint8_t *h, uint8_t *m, uint8_t *s);
+  void set_new_time(uint8_t h, uint8_t m, uint8_t s);
   /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
