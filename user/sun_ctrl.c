@@ -19,6 +19,7 @@ void _sun_pwr_ctrl(bool state)
 {
   if (state)
   {
+    LL_TIM_SetCounter(SUN_TIM, 0);
     LL_TIM_CC_EnableChannel(SUN_TIM, SUN_TIM_CH);
     LL_TIM_EnableCounter(SUN_TIM);
   }
@@ -26,8 +27,8 @@ void _sun_pwr_ctrl(bool state)
   {
     LL_TIM_CC_DisableChannel(SUN_TIM, SUN_TIM_CH);
     LL_TIM_DisableCounter(SUN_TIM);
+    LL_TIM_SetCounter(SUN_TIM, 0);
   }
-  LL_TIM_SetCounter(SUN_TIM, 0);
 }
 
 void sun_pwr_on(void)
