@@ -22,8 +22,7 @@
 #define __RTC_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -43,17 +42,18 @@ extern "C"
 
   // TODO modify defines according to your HW.
 
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
-  void MX_RTC_Init(void);
+void MX_RTC_Init(void);
 
-  /* USER CODE BEGIN Prototypes */
+/* USER CODE BEGIN Prototypes */
   void get_current_time(uint8_t *h, uint8_t *m, uint8_t *s);
   void set_new_time(uint8_t h, uint8_t m, uint8_t s);
-  /* USER CODE END Prototypes */
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __RTC_H__ */
+

@@ -85,6 +85,7 @@ void MX_RTC_Init(void)
 
   LL_RTC_EnableWriteProtection(RTC);
   /* USER CODE END RTC_Init 2 */
+
 }
 
 /* USER CODE BEGIN 1 */

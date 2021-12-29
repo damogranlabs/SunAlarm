@@ -95,6 +95,7 @@ int main(void)
   MX_GPIO_Init();
   MX_RTC_Init();
   MX_TIM1_Init();
+  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
   register_button(B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
   register_button(B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
