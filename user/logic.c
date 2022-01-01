@@ -27,15 +27,17 @@ void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity);
 void _handle_setup_sun_manual_intensity(bool force_refresh);
 void _handle_setup_wakeup_time(bool force_refresh);
 
-void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
+uint32_t _get_alarm_sun_intensity(void);
 
-uint32_t _get_alarm_sun_intensity_msec_per_step(void);
-uint32_t _get_next_alarm_sun_intensity(bool reset);
+void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
+uint32_t _time_to_msec(uint8_t time[2]);
 
 sm_area_t sm_area;
 configuration_t cfg_data;
 runtime_data_t runtime_data;
-extern rot_enc_data_t encoder;
+rot_enc_data_t encoder;
+
+volatile bool rtc_event = false;
 
 #define CFG_DATA_FLASH_ADD 0x80003C00 //0x80005000
 
@@ -54,8 +56,7 @@ void set_defaults(void)
 {
   runtime_data.is_setup_mode = false;
   runtime_data.is_alarm_active = false;
-  runtime_data.current_alarm_sun_intensity = cfg_data.sun_intensity_min;
-  runtime_data.next_alarm_sun_intensity_timestamp = 0;
+  runtime_data.last_alarm_intensity_timestamp = 0;
 
   _set_alarm_defaults();
   _set_alarm_start_time();
@@ -136,9 +137,6 @@ void handle_alarm(void)
   if (!is_alarm_enabled())
     return;
 
-  if (is_setup_mode())
-    return;
-
   get_current_time(&h, &m, &s);
 
   if (is_alarm_active())
@@ -159,11 +157,10 @@ void handle_alarm(void)
         }
       }
     }
-    else if (HAL_GetTick() >= runtime_data.next_alarm_sun_intensity_timestamp)
+    else if (HAL_GetTick() > runtime_data.last_alarm_intensity_timestamp)
     {
-      runtime_data.next_alarm_sun_intensity_timestamp += _get_alarm_sun_intensity_msec_per_step();
-      runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(false);
-      sun_set_intensity_precise(runtime_data.current_alarm_sun_intensity);
+      sun_set_intensity_precise(_get_alarm_sun_intensity());
+      runtime_data.last_alarm_intensity_timestamp = HAL_GetTick();
 
       return;
     }
@@ -179,49 +176,30 @@ void handle_alarm(void)
         if (m == runtime_data.alarm_start_time[M_POS])
         {
           // its is wake up time!
-          runtime_data.next_alarm_sun_intensity_timestamp = HAL_GetTick() + _get_alarm_sun_intensity_msec_per_step();
-          runtime_data.current_alarm_sun_intensity = _get_next_alarm_sun_intensity(true);
-
           set_alarm_active(true);
-          sun_set_intensity_precise(runtime_data.current_alarm_sun_intensity);
+          sun_set_intensity_precise(_get_alarm_sun_intensity());
           sun_pwr_on();
+
+          runtime_data.last_alarm_intensity_timestamp = HAL_GetTick();
         }
       }
     }
   }
 }
 
-uint32_t _get_alarm_sun_intensity_msec_per_step(void)
+uint32_t _get_alarm_sun_intensity(void)
 {
-  uint32_t num_of_steps = (get_sun_intensity_resolution() / SUN_INTENSITY_MAX) * (uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min);
-
-  //60000 = 60 * 1000 (min -> sec -> sec -> msec)
-  uint32_t msec_per_step = (((uint32_t)cfg_data.wakeup_time_min) * 60000) / num_of_steps;
-
-  // At very low wakeup times, it might be that msec_per_step is lower than 1.
-  // In that case, just set it to 1 step per msec
-  if (!msec_per_step)
-  {
-    msec_per_step = 1;
-  }
-
-  return msec_per_step;
-}
-
-uint32_t _get_next_alarm_sun_intensity(bool reset)
-{
-  static uint32_t intensity = 0;
-
-  if (reset)
-  {
-    intensity = (uint32_t)cfg_data.sun_intensity_min;
-  }
-  else
-  {
-    intensity++;
-  }
-
-  return intensity;
+  // y = kx + n
+  // intensity = (diff/dur)*time + intensity_min
+  // dur = wakeup length in minutes, scaled to msec
+  // time is time that intensity is searched for in msec
+  uint32_t diff = (get_sun_intensity_resolution() * (uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min) * 60 * 1e3) / SUN_INTENSITY_MAX;
+  uint32_t dur = (cfg_data.wakeup_time_min * 60 * 1e3);
+  uint32_t time = HAL_GetTick() - _time_to_msec(runtime_data.alarm_start_time);
+  uint32_t min = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_min) / SUN_INTENSITY_MAX;
+  // note: final function is written just a bit different to avoid division errors
+  //    because of rounding (integers instead of floats)
+  return (diff * time) / dur + min;
 }
 
 void _handle_setup(bool force_refresh)
@@ -466,6 +444,16 @@ void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min)
 
   *h_ptr = (uint8_t)h;
   *m_ptr = (uint8_t)m;
+}
+
+uint32_t _time_to_msec(uint8_t time[2])
+{
+  // time[2]; index 0 = H, 1 = M
+  uint32_t time_msec = time[H_POS] * 60 * 60; // H
+  time_msec += time[M_POS] * 60;              // M
+  time_msec *= 1e3;                           //sec -> msec
+
+  return time_msec;
 }
 
 void save_settings(void)

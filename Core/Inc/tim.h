@@ -32,14 +32,11 @@ extern "C" {
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim16;
-
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
 void MX_TIM1_Init(void);
-void MX_TIM16_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 

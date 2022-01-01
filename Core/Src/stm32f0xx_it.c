@@ -23,9 +23,15 @@
 #include "stm32f0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f0xx_ll_gpio.h"
+#include "stm32f0xx_ll_rtc.h"
+#include "stm32f0xx_ll_exti.h"
+#include "stm32f0xx_ll_tim.h"
+
 #include "rot_enc.h"
 #include "display_ctrl.h"
 #include "logic.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,7 +66,7 @@ extern volatile bool rtc_event;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern TIM_HandleTypeDef htim16;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -167,20 +173,6 @@ void EXTI0_1_IRQHandler(void)
   /* USER CODE END EXTI0_1_IRQn 1 */
 }
 
-/**
-  * @brief This function handles TIM16 global interrupt.
-  */
-void TIM16_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM16_IRQn 0 */
-
-  /* USER CODE END TIM16_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim16);
-  /* USER CODE BEGIN TIM16_IRQn 1 */
-
-  /* USER CODE END TIM16_IRQn 1 */
-}
-
 /* USER CODE BEGIN 1 */
 /**
   * @brief This function handles RTC global interrupt through EXTI lines 17, 19 and 20.
@@ -201,4 +193,3 @@ void RTC_IRQHandler(void)
 }
 
 /* USER CODE END 1 */
-

@@ -1,9 +1,10 @@
+
 #include <stdbool.h>
 
 #include "stm32f0xx_ll_tim.h"
+#include "stm32f0xx_hal_rcc.h"
 
 #include "sun_ctrl.h"
-
 #include "logic.h"
 
 extern configuration_t cfg_data;
@@ -50,11 +51,6 @@ void sun_pwr_on_manual(void)
 bool is_sun_enabled(void)
 {
   return (bool)LL_TIM_IsEnabledCounter(SUN_TIM);
-}
-
-uint32_t get_sun_intensity_resolution(void)
-{
-  return LL_TIM_GetAutoReload(SUN_TIM);
 }
 
 void sun_set_intensity(uint8_t intensity)

@@ -74,7 +74,7 @@ void MX_RTC_Init(void)
   }
 
   NVIC_ClearPendingIRQ(RTC_IRQn);
-  NVIC_SetPriority(RTC_IRQn, 0);
+  NVIC_SetPriority(RTC_IRQn, 1);
   NVIC_EnableIRQ(RTC_IRQn);
 
   LL_RTC_ALMA_Disable(RTC);
