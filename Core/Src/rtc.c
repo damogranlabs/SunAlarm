@@ -21,6 +21,8 @@
 #include "rtc.h"
 
 /* USER CODE BEGIN 0 */
+#include <stddef.h>
+
 #include "main.h"
 
 /* USER CODE END 0 */

@@ -41,6 +41,7 @@ typedef struct runtime_data_t
   bool is_setup_mode;
   bool is_alarm_active;
   uint8_t alarm_start_time[2];             //  HM
+  uint32_t alarm_start_timestamp;          //msec
   uint32_t last_alarm_intensity_timestamp; //msec
 } runtime_data_t;
 
@@ -55,6 +56,7 @@ bool is_setup_mode(void);
 
 void handle_interactions(void);
 void handle_alarm(void);
+void handle_alarm_intensity(bool restart);
 
 void update_settings(void);
 

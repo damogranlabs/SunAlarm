@@ -50,20 +50,22 @@ void on_button_press(btn_cfg_t *btn_cfg)
 {
   if (is_alarm_active())
   {
+    // use any button to cancel alarm
     set_alarm_active(false);
     ctrl_lcd_backlight(true, true);
   }
   else
   {
-    // use any button to cancel alarm
     if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
     {
       if (is_setup_mode())
       {
+        // in setup mode, move to next setup menu item
         update_settings();
       }
       else
       {
+        // toggle alarm enabled/disabled state
         set_alarm_state(!is_alarm_enabled());
         ctrl_lcd_backlight(true, true);
       }
@@ -72,23 +74,23 @@ void on_button_press(btn_cfg_t *btn_cfg)
     {
       // use this button to only turn on LCD backlight (see time/alarm).
       // Press again in this time to power on sun (manual intensity)
-      // Power off after next button press (LCd after timeout)
-      if (is_sun_enabled())
+      // Power off after next button press (LCD after timeout)
+      if (is_lcd_backlight_enabled())
       {
-        sun_pwr_off();
-        ctrl_lcd_backlight(true, true);
-      }
-      else
-      {
-        if (is_lcd_backlight_enabled())
+        if (is_sun_enabled())
+        {
+          sun_pwr_off();
+          ctrl_lcd_backlight(true, true);
+        }
+        else
         {
           sun_pwr_on_manual();
           ctrl_lcd_backlight(true, false);
         }
-        else
-        {
-          ctrl_lcd_backlight(true, true);
-        }
+      }
+      else
+      {
+        ctrl_lcd_backlight(true, true);
       }
     }
   }
@@ -106,15 +108,9 @@ void on_button_longpress(btn_cfg_t *btn_cfg)
 
   if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
   {
-    if (setup_mode)
-    {
-      ctrl_lcd_backlight(true, true);
-    }
-    else
-    {
-      ctrl_lcd_backlight(true, false);
-    }
-
+    // not in setup mode: enter setup mode and enable LCD backlight without timeout
+    // in setup mode: exit setup mode and enable LCD backlight with timeout
+    ctrl_lcd_backlight(true, setup_mode);
     set_setup_mode(!setup_mode);
   }
 }

@@ -12,6 +12,7 @@
 
 // add device/project specific includes
 #include "stm32f0xx_ll_gpio.h"
+#include "main.h"
 
 #define NUM_OF_BUTTONS 5 // number max registered buttons
 

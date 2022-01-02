@@ -10,9 +10,12 @@
 
 #include <stdint.h>
 
+#include "stm32f0xx_ll_gpio.h"
+
 #include "logic.h"
 
-#define TIME_STR_SIZE 8 // HH:MM:SS
+#define TIME_HMS_STR_SIZE 8 // HH:MM:SS
+#define TIME_HM_STR_SIZE 5  // HH:MM
 #define LCD_BACKLIGHT_OFF_DELAY_MS 4000
 
 void show_default(void);
@@ -26,8 +29,11 @@ void show_setup_item(sm_area_t sm_area, char *menu_str);
 
 void handle_lcd_backlight(void);
 void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight);
-bool is_lcd_backlight_enabled(void);
+static inline bool is_lcd_backlight_enabled(void)
+{
+    return !LL_GPIO_IsOutputPinSet(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
+}
 
-void time_to_str(char *time_str, uint8_t h, uint8_t m, int8_t s);
+void time_to_str(char *time_str, uint8_t *h, uint8_t *m, uint8_t *s);
 
 #endif /* DISPLAY_CTRL_H_ */

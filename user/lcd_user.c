@@ -13,8 +13,10 @@
 /* Includes -------------------------------------*/
 #include "lcd_user.h"
 
+#include "stm32f0xx_ll_utils.h"
 #include "system_stm32f0xx.h"
-#include "stm32f0xx_hal.h"
+
+extern uint32_t SystemCoreClock;
 
 #pragma GCC push_options
 #pragma GCC optimize("O0")
@@ -41,7 +43,7 @@ void lcd_delay_us(uint32_t uSec)
  */
 void lcd_delay_ms(uint32_t mSec)
 {
-  HAL_Delay(mSec);
+  LL_mDelay(mSec);
 }
 
 /**

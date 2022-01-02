@@ -8,13 +8,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "stm32f0xx_ll_gpio.h"
-
-#include "rtc.h"
-
 #include "lcd.h"
 
 #include "main.h"
+#include "rtc.h"
+
 #include "logic.h"
 #include "display_ctrl.h"
 
@@ -41,7 +39,7 @@
 #define M_AREA_SUN_MANUAL_INTENSITY "Luc"
 #define M_AREA_TIME "Ura"
 
-void _print_time(uint8_t X, uint8_t y, uint8_t h, uint8_t m, int8_t s);
+void _print_time(uint8_t y, uint8_t x, uint8_t *h, uint8_t *m, uint8_t *s);
 
 extern configuration_t cfg_data;
 
@@ -80,8 +78,8 @@ void show_time(void)
 
   get_current_time(&h, &m, &s);
 
-  lcd_clear_area(T_A_Y, LCD_X_SIZE - TIME_STR_SIZE, LCD_X_SIZE);
-  _print_time(T_A_Y, LCD_X_SIZE - 8 + 1, h, m, s); // 8 == 'HH:MM:SS'
+  lcd_clear_area(T_A_Y, LCD_X_SIZE - TIME_HMS_STR_SIZE, LCD_X_SIZE);
+  _print_time(T_A_Y, LCD_X_SIZE - 8 + 1, &h, &m, &s); // 8 == 'HH:MM:SS'
 }
 
 void show_alarm_state()
@@ -90,7 +88,7 @@ void show_alarm_state()
   if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
-    _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT), cfg_data.alarm_time[H_POS], cfg_data.alarm_time[M_POS], -1);
+    _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT), &cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], NULL);
   }
   else
   {
@@ -139,7 +137,7 @@ void handle_lcd_backlight(void)
 {
   if (lcd_off_timestamp != 0)
   {
-    if (HAL_GetTick() > lcd_off_timestamp)
+    if (GetTick() > lcd_off_timestamp)
     {
       ctrl_lcd_backlight(false, false);
       lcd_off_timestamp = 0;
@@ -154,7 +152,7 @@ void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
     LL_GPIO_ResetOutputPin(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
     if (auto_backlight)
     {
-      lcd_off_timestamp = HAL_GetTick() + LCD_BACKLIGHT_OFF_DELAY_MS;
+      lcd_off_timestamp = GetTick() + LCD_BACKLIGHT_OFF_DELAY_MS;
     }
     else
     {
@@ -168,35 +166,30 @@ void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
   }
 }
 
-bool is_lcd_backlight_enabled(void)
-{
-  return !LL_GPIO_IsOutputPinSet(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
-}
-
-void time_to_str(char *time_str, uint8_t h, uint8_t m, int8_t s)
+void time_to_str(char *time_str, uint8_t *h, uint8_t *m, uint8_t *s)
 {
   // helper func
   // print time on lcd in HH:MM:SS format, at given position.
-  // Omit seconds if s==-1
-  if (s == -1)
+  // Omit seconds if s==NULL
+  if (s == NULL)
   {
-    sprintf(time_str, "%2d:%02d", (int)h, (int)m);
+    sprintf(time_str, "%2d:%02d", *h, *m);
   }
   else
   {
-    sprintf(time_str, "%2d:%02d:%02d", (int)h, (int)m, (int)s);
+    sprintf(time_str, "%2d:%02d:%02d", *h, *m, *s);
   }
 }
 
-void _print_time(uint8_t y, uint8_t x, uint8_t h, uint8_t m, int8_t s)
+void _print_time(uint8_t y, uint8_t x, uint8_t *h, uint8_t *m, uint8_t *s)
 {
   // helper func
   // print time on lcd in HH:MM:SS format, at given position.
-  // Omit seconds if s==-1
-  char time_str[9];
-  if (s == -1)
+  // Omit seconds if s==NULL
+  char time_str[TIME_HMS_STR_SIZE + 1];
+  if (s == NULL)
   {
-    time_to_str(time_str, h, m, -1);
+    time_to_str(time_str, h, m, NULL);
   }
   else
   {

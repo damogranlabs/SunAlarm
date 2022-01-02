@@ -5,7 +5,7 @@
 
 #include "main.h"
 
-#include "stm32f0xx_hal_flash.h"
+#include "stm32f0xx_ll_utils.h"
 #include "rtc.h"
 
 #include "lcd.h"
@@ -15,6 +15,8 @@
 #include "logic.h"
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
+
+#define CFG_DATA_FLASH_ADD 0x80003C00 //0x80005000
 
 void _set_alarm_defaults(void);
 void _set_alarm_start_time(void);
@@ -30,7 +32,6 @@ void _handle_setup_wakeup_time(bool force_refresh);
 uint32_t _get_alarm_sun_intensity(void);
 
 void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min);
-uint32_t _time_to_msec(uint8_t time[2]);
 
 sm_area_t sm_area;
 configuration_t cfg_data;
@@ -38,8 +39,6 @@ runtime_data_t runtime_data;
 rot_enc_data_t encoder;
 
 volatile bool rtc_event = false;
-
-#define CFG_DATA_FLASH_ADD 0x80003C00 //0x80005000
 
 void _set_alarm_defaults(void)
 {
@@ -56,6 +55,7 @@ void set_defaults(void)
 {
   runtime_data.is_setup_mode = false;
   runtime_data.is_alarm_active = false;
+  runtime_data.alarm_start_timestamp = 0;
   runtime_data.last_alarm_intensity_timestamp = 0;
 
   _set_alarm_defaults();
@@ -134,9 +134,6 @@ void handle_alarm(void)
 {
   uint8_t h, m, s;
 
-  if (!is_alarm_enabled())
-    return;
-
   get_current_time(&h, &m, &s);
 
   if (is_alarm_active())
@@ -157,13 +154,6 @@ void handle_alarm(void)
         }
       }
     }
-    else if (HAL_GetTick() > runtime_data.last_alarm_intensity_timestamp)
-    {
-      sun_set_intensity_precise(_get_alarm_sun_intensity());
-      runtime_data.last_alarm_intensity_timestamp = HAL_GetTick();
-
-      return;
-    }
   }
   else
   {
@@ -177,13 +167,26 @@ void handle_alarm(void)
         {
           // its is wake up time!
           set_alarm_active(true);
-          sun_set_intensity_precise(_get_alarm_sun_intensity());
+          handle_alarm_intensity(true);
           sun_pwr_on();
-
-          runtime_data.last_alarm_intensity_timestamp = HAL_GetTick();
         }
       }
     }
+  }
+}
+
+void handle_alarm_intensity(bool restart)
+{
+  if (restart)
+  {
+    runtime_data.last_alarm_intensity_timestamp = 0;
+    runtime_data.alarm_start_timestamp = GetTick();
+  }
+
+  if (GetTick() > runtime_data.last_alarm_intensity_timestamp)
+  {
+    sun_set_intensity_precise(_get_alarm_sun_intensity());
+    runtime_data.last_alarm_intensity_timestamp = GetTick();
   }
 }
 
@@ -191,15 +194,27 @@ uint32_t _get_alarm_sun_intensity(void)
 {
   // y = kx + n
   // intensity = (diff/dur)*time + intensity_min
+  //
+  // diff = intensity range (max - min user settings) scaled to TIM PWM range.
   // dur = wakeup length in minutes, scaled to msec
   // time is time that intensity is searched for in msec
-  uint32_t diff = (get_sun_intensity_resolution() * (uint32_t)(cfg_data.sun_intensity_max - cfg_data.sun_intensity_min) * 60 * 1e3) / SUN_INTENSITY_MAX;
-  uint32_t dur = (cfg_data.wakeup_time_min * 60 * 1e3);
-  uint32_t time = HAL_GetTick() - _time_to_msec(runtime_data.alarm_start_time);
-  uint32_t min = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_min) / SUN_INTENSITY_MAX;
+  volatile uint32_t max = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_max) / SUN_INTENSITY_MAX;
+  volatile uint32_t min = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_min) / SUN_INTENSITY_MAX;
+  volatile uint32_t diff = max - min;
+  volatile uint32_t dur_ms = (cfg_data.wakeup_time_min * 60 * 1e3);
+  volatile uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
+
   // note: final function is written just a bit different to avoid division errors
   //    because of rounding (integers instead of floats)
-  return (diff * time) / dur + min;
+  volatile uint32_t intensity = (diff * time_ms) / dur_ms + min;
+  if (intensity > max)
+  {
+    return max;
+  }
+  else
+  {
+    return intensity;
+  }
 }
 
 void _handle_setup(bool force_refresh)
@@ -253,6 +268,8 @@ bool is_alarm_active(void)
 void set_alarm_active(bool is_active)
 {
   runtime_data.is_alarm_active = is_active;
+
+  show_alarm_active();
 }
 
 // modify alarm settings in the runtime
@@ -272,7 +289,7 @@ void _handle_alarm_time(void)
 
 void _handle_setup_wakeup_time(bool force_refresh)
 {
-  char time_str[TIME_STR_SIZE];
+  char time_str[4]; // uint8_t + null char
 
   int32_t count = rot_enc_get_count(&encoder);
   if ((count != 0) || (force_refresh == true))
@@ -297,7 +314,7 @@ void _handle_setup_wakeup_time(bool force_refresh)
 void _handle_setup_time(bool force_refresh, bool change_hours)
 {
   //change_hours: if True, rotary encoder is setting hours, else minutes
-  char time_str[TIME_STR_SIZE];
+  char time_str[TIME_HM_STR_SIZE];
   int8_t count = rot_enc_get_count(&encoder);
 
   if ((count != 0) || (force_refresh == true))
@@ -329,7 +346,7 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
       cfg_data.time[M_POS] = abs(count);
     }
 
-    time_to_str(time_str, cfg_data.time[H_POS], cfg_data.time[M_POS], -1);
+    time_to_str(time_str, &cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
     show_setup_item(sm_area, time_str);
   }
 }
@@ -338,7 +355,7 @@ void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity)
 {
   //change_min_intensity: if True, rotary encoder is setting minimum intensity,
   // else max intensity
-  char time_str[3]; // 0 - SUN_INTENSITY_MAX
+  char time_str[4]; // 0 - SUN_INTENSITY_MAX
   int8_t count = rot_enc_get_count(&encoder);
 
   if ((count != 0) || (force_refresh == true))
@@ -446,16 +463,7 @@ void _manipulate_time(uint8_t *h_ptr, uint8_t *m_ptr, int16_t change_min)
   *m_ptr = (uint8_t)m;
 }
 
-uint32_t _time_to_msec(uint8_t time[2])
-{
-  // time[2]; index 0 = H, 1 = M
-  uint32_t time_msec = time[H_POS] * 60 * 60; // H
-  time_msec += time[M_POS] * 60;              // M
-  time_msec *= 1e3;                           //sec -> msec
-
-  return time_msec;
-}
-
+/*
 void save_settings(void)
 {
   uint8_t var_idx;
@@ -528,3 +536,4 @@ void read_settings(void)
     *cfg_data_ptr = *(uint32_t *)flash_address;
   }
 }
+*/
