@@ -51,6 +51,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+extern volatile uint32_t systick_counter;
 extern rot_enc_data_t encoder;
 extern volatile bool rtc_event;
 /* USER CODE END PV */
@@ -95,7 +96,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-  volatile uint32_t status = HAL_FLASH_GetError();
+  // volatile uint32_t status = HAL_FLASH_GetError();
 
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
@@ -137,9 +138,10 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+  systick_counter++;
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
+
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
