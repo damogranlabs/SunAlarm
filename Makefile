@@ -58,7 +58,8 @@ user/lcd_user.c \
 user/rot_enc_user.c \
 user/logic.c \
 user/sun_ctrl.c \
-user/display_ctrl.c
+user/display_ctrl.c \
+user/flash.c
 
 # ASM sources
 ASM_SOURCES =  \
