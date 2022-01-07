@@ -1,10 +1,10 @@
-#ifndef SRC_SETUP_MENU_H_
-#define SRC_SETUP_MENU_H_
+#ifndef __LOGIC_H_
+#define __LOGIC_H_
 
 #include <stdbool.h>
 
-#define DEFAULT_WAKEUP_TIME_MIN 1
-#define DEFAULT_SUN_INTENSITY_MIN 10
+#define DEFAULT_WAKEUP_TIME_MIN 30
+#define DEFAULT_SUN_INTENSITY_MIN 0
 #define DEFAULT_SUN_INTENSITY_MAX SUN_INTENSITY_MAX
 #define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
 #define DEFAULT_ALARM_TIME_H 6
@@ -12,7 +12,6 @@
 
 #define H_POS 0
 #define M_POS 1
-#define S_POS 2
 
 typedef enum
 {
@@ -34,15 +33,22 @@ typedef struct configuration_t
   uint8_t sun_intensity_min;
   uint8_t sun_intensity_max;
   uint8_t sun_manual_intensity;
+
+  // used for setting alarm sun intensity (avoid re-calculating these static values all the time)
+  uint32_t sun_intensity_min_precise;
+  uint32_t sun_intensity_max_precise;
+  uint32_t sun_intensity_diff_precise;
+  uint32_t wakeup_time_ms;
 } configuration_t;
 
 typedef struct runtime_data_t
 {
   bool is_setup_mode;
   bool is_alarm_active;
-  uint8_t alarm_start_time[2];             //  HM
-  uint32_t alarm_start_timestamp;          //msec
-  uint32_t last_alarm_intensity_timestamp; //msec
+  uint8_t alarm_start_time[2];             // HM
+  uint32_t alarm_start_timestamp;          // msec
+  uint32_t last_alarm_intensity_timestamp; // msec
+
 } runtime_data_t;
 
 void set_defaults(void);
@@ -63,4 +69,4 @@ void update_settings(void);
 void write_settings(void);
 void read_settings(void);
 
-#endif /* SRC_SETUP_MENU_H_ */
+#endif /* __LOGIC_H_ */

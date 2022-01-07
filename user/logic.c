@@ -13,10 +13,9 @@
 #include "rot_enc.h"
 
 #include "logic.h"
+#include "flash.h"
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
-
-#define CFG_DATA_FLASH_ADD 0x80003C00 //0x80005000
 
 void _set_alarm_defaults(void);
 void _set_alarm_start_time(void);
@@ -42,23 +41,31 @@ volatile bool rtc_event = false;
 
 void _set_alarm_defaults(void)
 {
-  cfg_data.is_alarm_enabled = false;
-  cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
-  cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
-  cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
-  cfg_data.sun_intensity_min = DEFAULT_SUN_INTENSITY_MIN;
-  cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
-  cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
+  if (is_cfg_data_in_flash())
+  {
+    flash_read();
+  }
+  else
+  {
+    cfg_data.is_alarm_enabled = false;
+    cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
+    cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
+    cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
+    cfg_data.sun_intensity_min = DEFAULT_SUN_INTENSITY_MIN;
+    cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
+    cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
+  }
 }
 
 void set_defaults(void)
 {
+  _set_alarm_defaults();
+
   runtime_data.is_setup_mode = false;
   runtime_data.is_alarm_active = false;
   runtime_data.alarm_start_timestamp = 0;
   runtime_data.last_alarm_intensity_timestamp = 0;
 
-  _set_alarm_defaults();
   _set_alarm_start_time();
 }
 
@@ -79,7 +86,7 @@ void set_setup_mode(bool is_enabled)
   }
   else
   {
-    // TODO save cfg settings to flash?
+    flash_write();
     sun_pwr_off();
 
     set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
@@ -179,7 +186,12 @@ void handle_alarm_intensity(bool restart)
 {
   if (restart)
   {
-    runtime_data.last_alarm_intensity_timestamp = 0;
+    cfg_data.sun_intensity_max_precise = get_sun_intensity_value(cfg_data.sun_intensity_max);
+    cfg_data.sun_intensity_min_precise = get_sun_intensity_value(cfg_data.sun_intensity_min);
+    cfg_data.sun_intensity_diff_precise = cfg_data.sun_intensity_max_precise - cfg_data.sun_intensity_min_precise;
+    cfg_data.wakeup_time_ms = cfg_data.wakeup_time_min * 60 * 1e3;
+
+    runtime_data.last_alarm_intensity_timestamp = GetTick();
     runtime_data.alarm_start_timestamp = GetTick();
   }
 
@@ -198,18 +210,13 @@ uint32_t _get_alarm_sun_intensity(void)
   // diff = intensity range (max - min user settings) scaled to TIM PWM range.
   // dur = wakeup length in minutes, scaled to msec
   // time is time that intensity is searched for in msec
-  volatile uint32_t max = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_max) / SUN_INTENSITY_MAX;
-  volatile uint32_t min = (get_sun_intensity_resolution() * (uint32_t)cfg_data.sun_intensity_min) / SUN_INTENSITY_MAX;
-  volatile uint32_t diff = max - min;
-  volatile uint32_t dur_ms = (cfg_data.wakeup_time_min * 60 * 1e3);
-  volatile uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
-
   // note: final function is written just a bit different to avoid division errors
-  //    because of rounding (integers instead of floats)
-  volatile uint32_t intensity = (diff * time_ms) / dur_ms + min;
-  if (intensity > max)
+  //       because of rounding (integers instead of floats)
+  volatile uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
+  volatile uint32_t intensity = (uint32_t)((((uint64_t)cfg_data.sun_intensity_diff_precise * (uint64_t)time_ms) / (uint64_t)cfg_data.wakeup_time_ms) + (uint64_t)cfg_data.sun_intensity_min_precise);
+  if (intensity > cfg_data.sun_intensity_max_precise)
   {
-    return max;
+    return cfg_data.sun_intensity_max_precise;
   }
   else
   {
@@ -468,7 +475,7 @@ void save_settings(void)
 {
   uint8_t var_idx;
   uint32_t *cfg_data_ptr = (uint32_t *)&cfg_data;
-  uint32_t flash_add = CFG_DATA_FLASH_ADD;
+  uint32_t flash_add = &END_OF_FLASH - sizeof(cfg_data);
 
   volatile uint8_t wrBuf[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
 
