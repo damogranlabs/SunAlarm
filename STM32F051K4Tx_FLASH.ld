@@ -184,6 +184,9 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+
+  END_OF_FLASH = ORIGIN(FLASH)+ LENGTH(FLASH);
+  FLASH_LENGTH = LENGTH(FLASH);
 }
 
 
