@@ -30,4 +30,9 @@ static inline uint32_t get_sun_intensity_resolution(void)
     return LL_TIM_GetAutoReload(SUN_TIM);
 }
 
+static inline uint32_t get_sun_intensity_value(uint8_t user_intensity)
+{
+    return (get_sun_intensity_resolution() * user_intensity) / SUN_INTENSITY_MAX;
+}
+
 #endif /* SUN_CTRL_H_ */
