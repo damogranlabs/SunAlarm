@@ -35,8 +35,6 @@ void sun_pwr_on_manual(void)
 
 void sun_set_intensity(uint8_t intensity)
 {
-  // assert_param(intensity <= SUN_INTENSITY_MAX);
-
   // percent to value conversion
   uint32_t compare_val = get_sun_intensity_value(intensity);
 
@@ -45,8 +43,5 @@ void sun_set_intensity(uint8_t intensity)
 
 void sun_set_intensity_precise(uint32_t intensity)
 {
-  // assert_param(intensity <= get_sun_intensity_resolution());
-
   LL_TIM_OC_SetCompareCH4(SUN_TIM, intensity);
-  lcd_print_int(0, 2, intensity);
 }
