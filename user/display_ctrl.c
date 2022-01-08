@@ -37,7 +37,7 @@
 
 #define M_AREA_WAKEUP_TIME "Vzhod"
 #define M_AREA_SUN_INTENSITY "Sonce"
-#define M_AREA_SUN_MANUAL_INTENSITY "Lučka"
+#define M_AREA_SUN_MANUAL_INTENSITY "Nocna lucka"
 #define M_AREA_TIME "Ura"
 
 void _print_time(uint8_t y, uint8_t x, uint8_t *h, uint8_t *m, uint8_t *s);
