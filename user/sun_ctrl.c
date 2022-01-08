@@ -35,7 +35,7 @@ void sun_pwr_on_manual(void)
 
 void sun_set_intensity(uint8_t intensity)
 {
-  // percent to value conversion
+  // percent to value conversion (up to SUN_INTENSITY_MAX)
   uint32_t compare_val = get_sun_intensity_value(intensity);
 
   LL_TIM_OC_SetCompareCH4(SUN_TIM, compare_val);
