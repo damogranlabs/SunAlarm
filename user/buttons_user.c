@@ -48,16 +48,17 @@ btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg)
  */
 void on_button_press(btn_cfg_t *btn_cfg)
 {
-  if (is_alarm_active())
+  if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
   {
-    // use any button to cancel alarm
-    set_alarm_active(false);
-    ctrl_lcd_backlight(true, true);
-  }
-  else
-  {
-    if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
+    if (is_alarm_active())
     {
+      // use this button to cancel alarm
+      set_alarm_active(false);
+      ctrl_lcd_backlight(true, true);
+    }
+    else
+    {
+      // alarm not active, toggle runtime mode.
       if (is_setup_mode())
       {
         // in setup mode, move to next setup menu item
@@ -65,33 +66,33 @@ void on_button_press(btn_cfg_t *btn_cfg)
       }
       else
       {
-        // toggle alarm enabled/disabled state
+        // toggle alarm enabled/disabled state (state, not active status!)
         set_alarm_state(!is_alarm_enabled());
         ctrl_lcd_backlight(true, true);
       }
     }
-    else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
+  }
+  else if ((btn_cfg->gpio_port == B_LA_CTRL_Port) && (btn_cfg->gpio_pin == B_LA_CTRL_Pin))
+  {
+    // use this button to only turn on LCD backlight (see time/alarm).
+    // Press again in this time to power on sun (manual intensity)
+    // Power off after next button press (LCD after timeout)
+    if (is_lcd_backlight_enabled())
     {
-      // use this button to only turn on LCD backlight (see time/alarm).
-      // Press again in this time to power on sun (manual intensity)
-      // Power off after next button press (LCD after timeout)
-      if (is_lcd_backlight_enabled())
+      if (is_sun_enabled())
       {
-        if (is_sun_enabled())
-        {
-          sun_pwr_off();
-          ctrl_lcd_backlight(true, true);
-        }
-        else
-        {
-          sun_pwr_on_manual();
-          ctrl_lcd_backlight(true, false);
-        }
+        sun_pwr_off();
+        ctrl_lcd_backlight(true, true);
       }
       else
       {
-        ctrl_lcd_backlight(true, true);
+        sun_pwr_on_manual();
+        ctrl_lcd_backlight(true, false);
       }
+    }
+    else
+    {
+      ctrl_lcd_backlight(true, true);
     }
   }
 }
