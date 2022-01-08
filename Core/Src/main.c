@@ -11,6 +11,12 @@
  * @source  http://damogranlabs.com/
  *          https://github.com/damogranlabs/SunAlarm 
  * 
+ * 
+ * How to calibrate RTC?
+ *  ATM, `OUT_OD_1_Pin` pin is toggled each second. When calibrating, measure
+ *  this periode while modifying RTC prescallers (see 'rtc.h' defines):
+ *    RTC_ASYNCHPRESCALER
+ *    RTC_SYNCHPRESCALER
  * ******************************************************************************
  */
 /* USER CODE END Header */
