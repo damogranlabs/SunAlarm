@@ -26,7 +26,7 @@
 #define A_SETTINGS_Y 1
 #define A_SETTINGS_X 0
 #define A_TIME_XPOS 6
-#define A_ON_TEXT "Zbudi ob:"
+#define A_ON_TEXT "Kava ob:"
 #define A_OFF_TEXT "Brez alarma."
 
 // settings menu string position
@@ -37,7 +37,7 @@
 
 #define M_AREA_WAKEUP_TIME "Vzhod"
 #define M_AREA_SUN_INTENSITY "Sonce"
-#define M_AREA_SUN_MANUAL_INTENSITY "Luc"
+#define M_AREA_SUN_MANUAL_INTENSITY "Lučka"
 #define M_AREA_TIME "Ura"
 
 void _print_time(uint8_t y, uint8_t x, uint8_t *h, uint8_t *m, uint8_t *s);
@@ -104,7 +104,7 @@ void show_alarm_state()
   if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
-    _print_time(A_SETTINGS_Y, strlen(A_ON_TEXT), &cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], NULL);
+    _print_time(A_SETTINGS_Y, LCD_X_SIZE - TIME_HM_STR_SIZE + 1, &cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], NULL);
   }
   else
   {
