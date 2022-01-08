@@ -18,6 +18,8 @@
 #define TIME_HM_STR_SIZE 5  // HH:MM
 #define LCD_BACKLIGHT_OFF_DELAY_MS 4000
 
+void create_alarm_status_icon(void);
+
 void show_default(void);
 
 void show_time_and_alarm_active(void);

@@ -110,6 +110,7 @@ int main(void)
 
   lcd_init(2, 16);
   lcd_clear();
+  create_alarm_status_icon();
   ctrl_lcd_backlight(true, true);
 
   set_defaults();

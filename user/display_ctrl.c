@@ -20,6 +20,7 @@
 
 // time and alarm active status position
 #define T_A_Y 0
+#define A_LCD_POSITION 0 // LCD internal storage position index
 
 // alarm time info position
 #define A_SETTINGS_Y 1
@@ -45,6 +46,21 @@ extern configuration_t cfg_data;
 
 static uint32_t lcd_off_timestamp;
 
+// https://www.makerguides.com/character-lcd-arduino-tutorial/
+static uint8_t alarm_active_icon[] = {0b00100,
+                                      0b01110,
+                                      0b01110,
+                                      0b01110,
+                                      0b11111,
+                                      0b00000,
+                                      0b00100,
+                                      0b00000};
+
+void create_alarm_status_icon(void)
+{
+  lcd_create_char(A_LCD_POSITION, alarm_active_icon);
+}
+
 void show_default(void)
 {
   // this function show displays state on setup menu exit
@@ -67,7 +83,7 @@ void show_alarm_active(void)
   lcd_clear_area(T_A_Y, 0, 1);
   if (is_alarm_active())
   {
-    lcd_print_str(T_A_Y, 0, "!");
+    lcd_put_char(T_A_Y, 0, A_LCD_POSITION);
   }
 }
 
