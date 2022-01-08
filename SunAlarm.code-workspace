@@ -36,7 +36,16 @@
             "stm32f0xx_ll_gpio.h": "c",
             "stm32f0xx_ll_utils.h": "c",
             "stm32f0xx_ll_crs.h": "c",
-            "buttons_user.h": "c"
+            "buttons_user.h": "c",
+            "stm32f0xx_ll_system.h": "c",
+            "stm32f0xx_ll_bus.h": "c",
+            "stm32f0xx_ll_cortex.h": "c",
+            "stm32f0xx_it.h": "c",
+            "stm32f051x8.h": "c",
+            "flash.h": "c",
+            "logic.h": "c",
+            "cmath": "c",
+            "*.tcc": "c"
         },
         "cortex-debug.armToolchainPath": "C:/GNU_Arm_Embedded_Toolchain_10.3-2021.10/bin/",
         "cortex-debug.openocdPath": "C:/xpack-openocd-0.11.0-2/bin/openocd.exe",
