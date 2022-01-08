@@ -66,7 +66,4 @@ void handle_alarm_intensity(bool restart);
 
 void update_settings(void);
 
-void write_settings(void);
-void read_settings(void);
-
 #endif /* __LOGIC_H_ */
