@@ -104,7 +104,10 @@ void show_alarm_state()
   if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
-    _print_time(A_SETTINGS_Y, LCD_X_SIZE - TIME_HM_STR_SIZE + 1, &cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], NULL);
+    _print_time(A_SETTINGS_Y,
+                LCD_X_SIZE - TIME_HM_STR_SIZE + 1,
+                &cfg_data.alarm_time[H_POS],
+                &cfg_data.alarm_time[M_POS], NULL);
   }
   else
   {
