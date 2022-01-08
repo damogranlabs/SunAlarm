@@ -409,23 +409,21 @@ void _handle_setup_sun_manual_intensity(bool force_refresh)
 {
   char val_str[3]; // 0 - SUN_INTENSITY_MAX
   int16_t count = rot_enc_get_count(&encoder);
-  uint16_t value;
 
   if ((count != 0) || (force_refresh == true))
   {
-    value = (uint16_t)cfg_data.sun_manual_intensity + count;
-
-    if (value > SUN_INTENSITY_MAX)
+    count += (int16_t)cfg_data.sun_manual_intensity;
+    if (count > SUN_INTENSITY_MAX)
     {
       cfg_data.sun_manual_intensity = SUN_INTENSITY_MAX;
     }
-    else if (value <= 0)
+    else if (count <= 0)
     {
       cfg_data.sun_manual_intensity = 0;
     }
     else
     {
-      cfg_data.sun_manual_intensity = (uint8_t)value;
+      cfg_data.sun_manual_intensity = (uint8_t)count;
     }
 
     sun_set_intensity(cfg_data.sun_manual_intensity);
