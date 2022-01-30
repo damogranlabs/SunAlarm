@@ -22,7 +22,8 @@
 #define __RTC_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -33,35 +34,53 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
-
-// RTC prescaller settings to get 1 second as precise as possible
-// Measure second duration via SEC_TOGGLE_Pin
+// ATM, current PCB does not have external crystal for RTC. Internal LSI is used, which is really bad, but c'est a la vie.
+// Set following RTC prescaller settings to get 1 second as precise as possible - measure second duration via SEC_TOGGLE_Pin.
+// RTC_ASYNCHPRESCALER: max 0x7F (127)
+// RTC_SYNCHPRESCALER: max 0x7FFF (32767)
+//
+// For the record: I have no idea how these prescalers affect the RTC clock. I couldn't figure out ho to reliably
+// predict the numbers, as measurements did not align with the reference manual and STM notes.
+// https://www.st.com/resource/en/application_note/an3371-using-the-hardware-realtime-clock-rtc-in-stm32-f0-f2-f3-f4-and-l1-series-of-mcus-stmicroelectronics.pdf
 #ifdef NEJCS_PCB
-// Each second is about 30us short.
-// That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
+// Each second is about 30us late.
+// That is about 2.6 second/per day. -> each 23 days, SunAlarm is 1 minute behind.
 #define RTC_ASYNCHPRESCALER 123
 #define RTC_SYNCHPRESCALER 329
+
 #elif DOMENS_PCB
-// Each second is about 30us short.
-// That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
-#define RTC_ASYNCHPRESCALER 123
-#define RTC_SYNCHPRESCALER 329
+// Each second is about 20us ahead.
+// That is about 19.7 second/per day. -> each 34 days, SunAlarm is 1 minute ahead.
+#define RTC_ASYNCHPRESCALER 50
+#define RTC_SYNCHPRESCALER 785
+// about 230us ahead
+//#define RTC_ASYNCHPRESCALER 122
+//#define RTC_SYNCHPRESCALER 325
+// about 600us late
+//#define RTC_ASYNCHPRESCALER 127
+//#define RTC_SYNCHPRESCALER 312
+// about 500us late
+//#define RTC_ASYNCHPRESCALER 125
+//#define RTC_SYNCHPRESCALER 317
+// about 900us ahead
+//#define RTC_ASYNCHPRESCALER 124
+//#define RTC_SYNCHPRESCALER 320
+
 #else
 #error "PCB not selected: missing RTC_ASYNCHPRESCALER and RTC_SYNCHPRESCALER settings (defines)."
 #endif
 
-/* USER CODE END Private defines */
+  /* USER CODE END Private defines */
 
-void MX_RTC_Init(void);
+  void MX_RTC_Init(void);
 
-/* USER CODE BEGIN Prototypes */
+  /* USER CODE BEGIN Prototypes */
   void get_current_time(uint8_t *h, uint8_t *m, uint8_t *s);
   void set_new_time(uint8_t h, uint8_t m, uint8_t s);
-/* USER CODE END Prototypes */
+  /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __RTC_H__ */
-
