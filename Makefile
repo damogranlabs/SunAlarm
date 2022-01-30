@@ -123,7 +123,6 @@ C_DEFS =  \
 # or 
 # or # -DNEJCS_PCB
 
-
 # AS includes
 AS_INCLUDES = 
 
