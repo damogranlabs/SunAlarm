@@ -86,6 +86,8 @@ void Error_Handler(void);
 #define OUT_OD_1_GPIO_Port GPIOA
 #define LCD_RS_Pin LL_GPIO_PIN_8
 #define LCD_RS_GPIO_Port GPIOA
+#define PIR3_Pin LL_GPIO_PIN_9
+#define PIR3_GPIO_Port GPIOA
 #define LCD_E_Pin LL_GPIO_PIN_10
 #define LCD_E_GPIO_Port GPIOA
 #define PIR2_Pin LL_GPIO_PIN_11
@@ -129,6 +131,9 @@ void Error_Handler(void);
 
 #define LCD_BACKLIGHT_Pin PIR1_Pin
 #define LCD_BACKLIGHT_Port PIR1_GPIO_Port
+
+#define SEC_TOGGLE_Pin PIR3_Pin
+#define SEC_TOGGLE_Port PIR3_GPIO_Port
 
 /* USER CODE END Private defines */
 

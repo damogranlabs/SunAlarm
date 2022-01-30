@@ -183,7 +183,7 @@ void RTC_IRQHandler(void)
 {
   /* USER CODE BEGIN RTC_IRQn 0 */
   rtc_event = true;
-  LL_GPIO_TogglePin(OUT_OD_1_GPIO_Port, OUT_OD_1_Pin);
+  LL_GPIO_TogglePin(SEC_TOGGLE_Port, SEC_TOGGLE_Pin);
 
   LL_RTC_ClearFlag_ALRA(RTC);
   LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_17);
@@ -195,3 +195,4 @@ void RTC_IRQHandler(void)
 }
 
 /* USER CODE END 1 */
+

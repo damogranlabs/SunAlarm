@@ -57,6 +57,9 @@ void MX_GPIO_Init(void)
   LL_GPIO_ResetOutputPin(LCD_RS_GPIO_Port, LCD_RS_Pin);
 
   /**/
+  LL_GPIO_ResetOutputPin(PIR3_GPIO_Port, PIR3_Pin);
+
+  /**/
   LL_GPIO_ResetOutputPin(LCD_E_GPIO_Port, LCD_E_Pin);
 
   /**/
@@ -117,6 +120,14 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(LCD_RS_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = PIR3_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(PIR3_GPIO_Port, &GPIO_InitStruct);
 
   /**/
   GPIO_InitStruct.Pin = LCD_E_Pin;

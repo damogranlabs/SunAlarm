@@ -22,8 +22,7 @@
 #define __RTC_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -36,22 +35,33 @@ extern "C"
 /* USER CODE BEGIN Private defines */
 
 // RTC prescaller settings to get 1 second as precise as possible
-// Nejc board, first SunAlarm ever: this specific HW at room temperature, each second is about 30us short.
+// Measure second duration via SEC_TOGGLE_Pin
+#ifdef NEJCS_PCB
+// Each second is about 30us short.
 // That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
 #define RTC_ASYNCHPRESCALER 123
 #define RTC_SYNCHPRESCALER 329
+#elif DOMENS_PCB
+// Each second is about 30us short.
+// That is about 2.6 second/per day. -> each 23 days, you are 1 minute behind.
+#define RTC_ASYNCHPRESCALER 123
+#define RTC_SYNCHPRESCALER 329
+#else
+#error "PCB not selected: missing RTC_ASYNCHPRESCALER and RTC_SYNCHPRESCALER settings (defines)."
+#endif
 
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
-  void MX_RTC_Init(void);
+void MX_RTC_Init(void);
 
-  /* USER CODE BEGIN Prototypes */
+/* USER CODE BEGIN Prototypes */
   void get_current_time(uint8_t *h, uint8_t *m, uint8_t *s);
   void set_new_time(uint8_t h, uint8_t m, uint8_t s);
-  /* USER CODE END Prototypes */
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __RTC_H__ */
+
