@@ -53,9 +53,11 @@ void MX_RTC_Init(void)
   LL_RTC_SetSynchPrescaler(RTC, 329);
   /* USER CODE BEGIN RTC_Init 2 */
 
-  //NOTE: settings can be set in rtc.h file
-  LL_RTC_SetAsynchPrescaler(RTC, RTC_ASYNCHPRESCALER);
-  LL_RTC_SetSynchPrescaler(RTC, RTC_SYNCHPRESCALER);
+  RTC_InitStruct.HourFormat = LL_RTC_HOURFORMAT_24HOUR;
+  //NOTE: settings should be set in rtc.h file
+  RTC_InitStruct.AsynchPrescaler = RTC_ASYNCHPRESCALER;
+  RTC_InitStruct.SynchPrescaler = RTC_SYNCHPRESCALER;
+  LL_RTC_Init(RTC, &RTC_InitStruct);
 
   LL_RTC_DisableWriteProtection(RTC);
   if (LL_RTC_WaitForSynchro(RTC) == ERROR)
@@ -87,7 +89,6 @@ void MX_RTC_Init(void)
 
   LL_RTC_EnableWriteProtection(RTC);
   /* USER CODE END RTC_Init 2 */
-
 }
 
 /* USER CODE BEGIN 1 */
