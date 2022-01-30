@@ -166,6 +166,7 @@ void handle_lcd_backlight(void)
 
 void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
 {
+  // PNP transistor
   if (is_enabled)
   {
     LL_GPIO_ResetOutputPin(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);
