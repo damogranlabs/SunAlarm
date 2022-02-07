@@ -13,6 +13,8 @@
 #define H_POS 0
 #define M_POS 1
 
+#define SETUP_TIMEOUT_MSEC 30e3 // 60 sec
+
 typedef enum
 {
   SETUP_WAKEUP_TIME,
@@ -49,6 +51,8 @@ typedef struct runtime_data_t
   uint32_t alarm_start_timestamp;          // msec
   uint32_t last_alarm_intensity_timestamp; // msec
 
+  uint32_t setup_timeout_timestamp;
+
 } runtime_data_t;
 
 void set_defaults(void);
@@ -57,7 +61,7 @@ bool is_alarm_enabled(void);
 bool is_alarm_active(void);
 void set_alarm_active(bool is_active);
 
-void set_setup_mode(bool is_enabled);
+void set_setup_mode(bool is_enabled, bool is_timeout);
 bool is_setup_mode(void);
 
 void handle_interactions(void);

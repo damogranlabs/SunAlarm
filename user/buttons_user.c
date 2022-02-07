@@ -112,6 +112,6 @@ void on_button_longpress(btn_cfg_t *btn_cfg)
     // not in setup mode: enter setup mode and enable LCD backlight without timeout
     // in setup mode: exit setup mode and enable LCD backlight with timeout
     ctrl_lcd_backlight(true, setup_mode);
-    set_setup_mode(!setup_mode);
+    set_setup_mode(!setup_mode, false);
   }
 }

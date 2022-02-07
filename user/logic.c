@@ -69,12 +69,13 @@ void set_defaults(void)
   _set_alarm_start_time();
 }
 
-void set_setup_mode(bool is_enabled)
+void set_setup_mode(bool is_enabled, bool is_timeout)
 {
   runtime_data.is_setup_mode = is_enabled;
   if (is_enabled)
   {
     sm_area = SETUP_WAKEUP_TIME;
+    runtime_data.setup_timeout_timestamp = GetTick() + SETUP_TIMEOUT_MSEC;
     rot_enc_reset_count(&encoder);
 
     get_current_time(&cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
@@ -87,12 +88,14 @@ void set_setup_mode(bool is_enabled)
   else
   {
     flash_write();
+
+    if (!is_timeout)
+    {
+      set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
+      _set_alarm_start_time();
+    }
+
     sun_pwr_off();
-
-    set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
-
-    _set_alarm_start_time();
-
     show_default();
   }
 }
@@ -119,7 +122,14 @@ void handle_interactions(void)
 {
   if (is_setup_mode())
   {
-    _handle_setup(false);
+    if (GetTick() > runtime_data.setup_timeout_timestamp)
+    {
+      set_setup_mode(false, true);
+    }
+    else
+    {
+      _handle_setup(false);
+    }
   }
   else if (is_alarm_enabled())
   {
@@ -320,7 +330,7 @@ void _handle_setup_wakeup_time(bool force_refresh)
 
 void _handle_setup_time(bool force_refresh, bool change_hours)
 {
-  //change_hours: if True, rotary encoder is setting hours, else minutes
+  // change_hours: if True, rotary encoder is setting hours, else minutes
   char time_str[TIME_HM_STR_SIZE];
   int8_t count = rot_enc_get_count(&encoder);
 
@@ -360,8 +370,8 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
 
 void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity)
 {
-  //change_min_intensity: if True, rotary encoder is setting minimum intensity,
-  // else max intensity
+  // change_min_intensity: if True, rotary encoder is setting minimum intensity,
+  //  else max intensity
   char time_str[4]; // 0 - SUN_INTENSITY_MAX
   int8_t count = rot_enc_get_count(&encoder);
 
