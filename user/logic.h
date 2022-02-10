@@ -1,6 +1,7 @@
 #ifndef __LOGIC_H_
 #define __LOGIC_H_
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #define DEFAULT_WAKEUP_TIME_MIN 30
