@@ -3,7 +3,7 @@
  *
  *  Created on: 27 nov 2021
  *      Author: domen
-*/
+ */
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -125,9 +125,6 @@ void show_setup_item(sm_area_t sm_area, char *value_str)
     sprintf(setting_str, "@ %s (m):", M_AREA_WAKEUP_TIME);
     break;
 
-  case SETUP_SUN_MIN_INTENSITY:
-    sprintf(setting_str, "@ %s (min):", M_AREA_SUN_INTENSITY);
-    break;
   case SETUP_SUN_MAX_INTENSITY:
     sprintf(setting_str, "@ %s (max):", M_AREA_SUN_INTENSITY);
     break;

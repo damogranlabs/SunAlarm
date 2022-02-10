@@ -17,7 +17,6 @@
 typedef enum
 {
   SETUP_WAKEUP_TIME,
-  SETUP_SUN_MIN_INTENSITY,
   SETUP_SUN_MAX_INTENSITY,
   SETUP_SUN_DEFAULT_INTENSITY,
   SETUP_TIME_H,
@@ -31,14 +30,11 @@ typedef struct configuration_t
   uint8_t time[2];       //  HM
   uint8_t alarm_time[2]; //  HM
   uint8_t wakeup_time_min;
-  uint8_t sun_intensity_min;
   uint8_t sun_intensity_max;
   uint8_t sun_manual_intensity;
 
   // used for setting alarm sun intensity (avoid re-calculating these static values all the time)
-  uint32_t sun_intensity_min_precise;
   uint32_t sun_intensity_max_precise;
-  uint32_t sun_intensity_diff_precise;
   uint32_t wakeup_time_ms;
 } configuration_t;
 

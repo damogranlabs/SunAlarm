@@ -24,7 +24,7 @@ void _handle_alarm_time(void);
 void _handle_setup(bool force_refresh);
 void _handle_setup_alarm_time(void);
 void _handle_setup_time(bool force_refresh, bool h_or_m);
-void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity);
+void _handle_setup_sun_intensity(bool force_refresh);
 void _handle_setup_sun_manual_intensity(bool force_refresh);
 void _handle_setup_wakeup_time(bool force_refresh);
 
@@ -51,7 +51,6 @@ void _set_alarm_defaults(void)
     cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
     cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
     cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
-    cfg_data.sun_intensity_min = DEFAULT_SUN_INTENSITY_MIN;
     cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
     cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
   }
@@ -79,7 +78,7 @@ void set_setup_mode(bool is_enabled)
 
     get_current_time(&cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
 
-    sun_set_intensity(cfg_data.sun_intensity_min);
+    sun_set_intensity(0);
     sun_pwr_on();
 
     _handle_setup(true);
@@ -187,8 +186,6 @@ void handle_alarm_intensity(bool restart)
   if (restart)
   {
     cfg_data.sun_intensity_max_precise = get_sun_intensity_value(cfg_data.sun_intensity_max);
-    cfg_data.sun_intensity_min_precise = get_sun_intensity_value(cfg_data.sun_intensity_min);
-    cfg_data.sun_intensity_diff_precise = cfg_data.sun_intensity_max_precise - cfg_data.sun_intensity_min_precise;
     cfg_data.wakeup_time_ms = cfg_data.wakeup_time_min * 60 * 1e3;
 
     runtime_data.last_alarm_intensity_timestamp = GetTick();
@@ -205,15 +202,15 @@ void handle_alarm_intensity(bool restart)
 uint32_t _get_alarm_sun_intensity(void)
 {
   // y = kx + n
-  // intensity = (diff/dur)*time + intensity_min
+  // intensity = (max/dur)*time + intensity_min
   //
-  // diff = intensity range (max - min user settings) scaled to TIM PWM range.
+  // max = intensity range (sun max user settings) scaled to TIM PWM range.
   // dur = wakeup length in minutes, scaled to msec
   // time is time that intensity is searched for in msec
   // note: final function is written just a bit different to avoid division errors
   //       because of rounding (integers instead of floats)
   volatile uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
-  volatile uint32_t intensity = (uint32_t)((((uint64_t)cfg_data.sun_intensity_diff_precise * (uint64_t)time_ms) / (uint64_t)cfg_data.wakeup_time_ms) + (uint64_t)cfg_data.sun_intensity_min_precise);
+  volatile uint32_t intensity = (uint32_t)((((uint64_t)cfg_data.sun_intensity_max_precise * (uint64_t)time_ms) / (uint64_t)cfg_data.wakeup_time_ms));
   if (intensity > cfg_data.sun_intensity_max_precise)
   {
     return cfg_data.sun_intensity_max_precise;
@@ -232,11 +229,8 @@ void _handle_setup(bool force_refresh)
     _handle_setup_wakeup_time(force_refresh);
     break;
 
-  case SETUP_SUN_MIN_INTENSITY:
-    _handle_setup_sun_intensity(force_refresh, true);
-    break;
   case SETUP_SUN_MAX_INTENSITY:
-    _handle_setup_sun_intensity(force_refresh, false);
+    _handle_setup_sun_intensity(force_refresh);
     break;
 
   case SETUP_SUN_DEFAULT_INTENSITY:
@@ -320,7 +314,7 @@ void _handle_setup_wakeup_time(bool force_refresh)
 
 void _handle_setup_time(bool force_refresh, bool change_hours)
 {
-  //change_hours: if True, rotary encoder is setting hours, else minutes
+  // change_hours: if True, rotary encoder is setting hours, else minutes
   char time_str[TIME_HM_STR_SIZE];
   int8_t count = rot_enc_get_count(&encoder);
 
@@ -358,49 +352,29 @@ void _handle_setup_time(bool force_refresh, bool change_hours)
   }
 }
 
-void _handle_setup_sun_intensity(bool force_refresh, bool change_min_intensity)
+void _handle_setup_sun_intensity(bool force_refresh)
 {
-  //change_min_intensity: if True, rotary encoder is setting minimum intensity,
-  // else max intensity
+  // change_min_intensity: if True, rotary encoder is setting minimum intensity,
+  //  else max intensity
   char time_str[4]; // 0 - SUN_INTENSITY_MAX
   int8_t count = rot_enc_get_count(&encoder);
 
   if ((count != 0) || (force_refresh == true))
   {
-    if (change_min_intensity)
+    if ((cfg_data.sun_intensity_max + count) > SUN_INTENSITY_MAX)
     {
-      if ((cfg_data.sun_intensity_min + count) > cfg_data.sun_intensity_max)
-      {
-        cfg_data.sun_intensity_min = cfg_data.sun_intensity_max - 1;
-      }
-      else if ((cfg_data.sun_intensity_min + count) <= 0)
-      {
-        cfg_data.sun_intensity_min = 0;
-      }
-      else
-      {
-        cfg_data.sun_intensity_min += count;
-      }
-      sun_set_intensity(cfg_data.sun_intensity_min);
-      sprintf(time_str, "%d", cfg_data.sun_intensity_min);
+      cfg_data.sun_intensity_max = SUN_INTENSITY_MAX;
+    }
+    else if ((cfg_data.sun_intensity_max + count) <= 0)
+    {
+      cfg_data.sun_intensity_max = 1;
     }
     else
     {
-      if ((cfg_data.sun_intensity_max + count) > SUN_INTENSITY_MAX)
-      {
-        cfg_data.sun_intensity_max = SUN_INTENSITY_MAX;
-      }
-      else if ((cfg_data.sun_intensity_max + count) <= cfg_data.sun_intensity_min)
-      {
-        cfg_data.sun_intensity_max = cfg_data.sun_intensity_min + 1;
-      }
-      else
-      {
-        cfg_data.sun_intensity_max += count;
-      }
-      sun_set_intensity(cfg_data.sun_intensity_max);
-      sprintf(time_str, "%d", cfg_data.sun_intensity_max);
+      cfg_data.sun_intensity_max += count;
     }
+    sun_set_intensity(cfg_data.sun_intensity_max);
+    sprintf(time_str, "%d", cfg_data.sun_intensity_max);
     show_setup_item(sm_area, time_str);
   }
 }
