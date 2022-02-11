@@ -45,7 +45,8 @@
             "flash.h": "c",
             "logic.h": "c",
             "cmath": "c",
-            "*.tcc": "c"
+            "*.tcc": "c",
+            "lcd.h": "c"
         },
         "cortex-debug.armToolchainPath": "C:/GNU_Arm_Embedded_Toolchain_10.3-2021.10/bin/",
         "cortex-debug.openocdPath": "C:/xpack-openocd-0.11.0-2/bin/openocd.exe",
