@@ -64,6 +64,7 @@ void set_defaults(void)
   runtime_data.is_alarm_active = false;
   runtime_data.alarm_start_timestamp = 0;
   runtime_data.last_alarm_intensity_timestamp = 0;
+  runtime_data.setup_mode_end_timestamp = 0;
 
   _set_alarm_start_time();
 }
@@ -75,6 +76,7 @@ void set_setup_mode(bool is_enabled)
   {
     sm_area = SETUP_WAKEUP_TIME;
     rot_enc_reset_count(&encoder);
+    runtime_data.setup_mode_end_timestamp = GetTick() + (SETUP_MODE_TIMEOUT_SEC * 1000);
 
     get_current_time(&cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
 
@@ -118,7 +120,14 @@ void handle_interactions(void)
 {
   if (is_setup_mode())
   {
-    _handle_setup(false);
+    if (GetTick() > runtime_data.setup_mode_end_timestamp)
+    {
+      set_setup_mode(false);
+    }
+    else
+    {
+      _handle_setup(false);
+    }
   }
   else if (is_alarm_enabled())
   {
@@ -186,7 +195,7 @@ void handle_alarm_intensity(bool restart)
   if (restart)
   {
     cfg_data.sun_intensity_max_precise = get_sun_intensity_value(cfg_data.sun_intensity_max);
-    cfg_data.wakeup_time_ms = cfg_data.wakeup_time_min * 60 * 1e3;
+    cfg_data.wakeup_time_ms = ((uint32_t)cfg_data.wakeup_time_min) * 60 * 1000;
 
     runtime_data.last_alarm_intensity_timestamp = GetTick();
     runtime_data.alarm_start_timestamp = GetTick();

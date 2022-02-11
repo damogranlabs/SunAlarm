@@ -10,6 +10,7 @@
 #define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
 #define DEFAULT_ALARM_TIME_H 6
 #define DEFAULT_ALARM_TIME_M 30
+#define SETUP_MODE_TIMEOUT_SEC 120
 
 #define H_POS 0
 #define M_POS 1
@@ -45,6 +46,7 @@ typedef struct runtime_data_t
   uint8_t alarm_start_time[2];             // HM
   uint32_t alarm_start_timestamp;          // msec
   uint32_t last_alarm_intensity_timestamp; // msec
+  uint32_t setup_mode_end_timestamp;       // msec
 
 } runtime_data_t;
 
