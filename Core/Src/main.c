@@ -2,15 +2,15 @@
 /**
  ******************************************************************************
  * @file           : main.c
- * @brief          : Main program body 
+ * @brief          : Main program body
  ******************************************************************************
- * 
+ *
  * SunAlarm
  * @date    Jan-2022
  * @author  Domen Jurkovic
  * @source  http://damogranlabs.com/
- *          https://github.com/damogranlabs/SunAlarm 
- * 
+ *          https://github.com/damogranlabs/SunAlarm
+ *
  * ******************************************************************************
  */
 /* USER CODE END Header */
@@ -66,9 +66,9 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -116,7 +116,6 @@ int main(void)
   set_defaults();
   sun_init();
   show_alarm_state();
-  set_new_time(7, 0, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -156,9 +155,9 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   LL_FLASH_SetLatency(LL_FLASH_LATENCY_0);
@@ -206,9 +205,9 @@ uint32_t GetTick(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -222,12 +221,12 @@ void Error_Handler(void)
 
 #ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

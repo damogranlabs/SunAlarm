@@ -44,6 +44,7 @@ void _set_alarm_defaults(void)
   if (is_cfg_data_in_flash())
   {
     flash_read();
+    set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
   }
   else
   {
@@ -87,10 +88,9 @@ void set_setup_mode(bool is_enabled)
   }
   else
   {
+    set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
     flash_write();
     sun_pwr_off();
-
-    set_new_time(cfg_data.time[H_POS], cfg_data.time[M_POS], 0);
 
     _set_alarm_start_time();
 
