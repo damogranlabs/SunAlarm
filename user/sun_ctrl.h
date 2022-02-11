@@ -32,7 +32,7 @@ static inline uint32_t get_sun_intensity_resolution(void)
 
 static inline uint32_t get_sun_intensity_value(uint8_t user_intensity)
 {
-    return (get_sun_intensity_resolution() * user_intensity) / SUN_INTENSITY_MAX;
+    return (get_sun_intensity_resolution() * (uint32_t)user_intensity) / SUN_INTENSITY_MAX;
 }
 
 #endif /* SUN_CTRL_H_ */
