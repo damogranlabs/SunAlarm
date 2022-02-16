@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "stm32f0xx_ll_tim.h"
+
 // TIM1 CH4, PA11, PIR2
 
 #define SUN_TIM TIM1
@@ -20,6 +22,8 @@ void sun_pwr_on_manual(void);
 void sun_set_intensity(uint8_t intensity);
 void sun_set_intensity_precise(uint32_t intensity);
 
+uint32_t get_sun_intensity_value(uint8_t user_intensity);
+
 static inline bool is_sun_enabled(void)
 {
     return (bool)LL_TIM_IsEnabledCounter(SUN_TIM);
@@ -28,11 +32,6 @@ static inline bool is_sun_enabled(void)
 static inline uint32_t get_sun_intensity_resolution(void)
 {
     return LL_TIM_GetAutoReload(SUN_TIM);
-}
-
-static inline uint32_t get_sun_intensity_value(uint8_t user_intensity)
-{
-    return (get_sun_intensity_resolution() * (uint32_t)user_intensity) / SUN_INTENSITY_MAX;
 }
 
 #endif /* SUN_CTRL_H_ */
