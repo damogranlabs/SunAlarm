@@ -12,8 +12,6 @@ uint16_t _scale_intensity_to_lut(uint32_t intensity);
 // Gamma brightness lookup table <https://victornpb.github.io/gamma-table-generator>
 // gamma = 3.30 steps = 1500 range = 0-65535
 #define LUT_SIZE 1500
-#define LUT_MIN_VAL 0
-// #define LUT_MAX_VAL get_sun_intensity_resolution
 const uint16_t gamma_lut[LUT_SIZE] = {
      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
