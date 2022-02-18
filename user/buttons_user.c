@@ -77,22 +77,25 @@ void on_button_press(btn_cfg_t *btn_cfg)
     // use this button to only turn on LCD backlight (see time/alarm).
     // Press again in this time to power on sun (manual intensity)
     // Power off after next button press (LCD after timeout)
-    if (is_lcd_backlight_enabled())
+    if (!is_setup_mode())
     {
-      if (is_sun_enabled())
+      if (is_lcd_backlight_enabled())
       {
-        sun_pwr_off();
-        ctrl_lcd_backlight(true, true);
+        if (is_sun_enabled())
+        {
+          sun_pwr_off();
+          ctrl_lcd_backlight(true, true);
+        }
+        else
+        {
+          sun_pwr_on_manual();
+          ctrl_lcd_backlight(true, false);
+        }
       }
       else
       {
-        sun_pwr_on_manual();
-        ctrl_lcd_backlight(true, false);
+        ctrl_lcd_backlight(true, true);
       }
-    }
-    else
-    {
-      ctrl_lcd_backlight(true, true);
     }
   }
 }
