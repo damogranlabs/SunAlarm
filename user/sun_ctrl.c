@@ -146,7 +146,7 @@ void sun_set_intensity(uint8_t intensity)
 uint16_t _scale_intensity_to_lut(uint32_t intensity)
 {
   // scale intensity range to length of LUT
-  uint32_t idx_in_lut = (intensity * LUT_SIZE) / get_sun_intensity_resolution();
+  uint32_t idx_in_lut = (intensity * LUT_SIZE) / cfg_data.intensity_resolution;
 
   return gamma_lut[idx_in_lut - 1];
 }
@@ -158,5 +158,5 @@ void sun_set_intensity_precise(uint32_t intensity)
 
 uint32_t get_sun_intensity_value(uint8_t user_intensity)
 {
-  return (get_sun_intensity_resolution() * (uint32_t)user_intensity) / SUN_INTENSITY_MAX;
+  return (cfg_data.intensity_resolution * (uint32_t)user_intensity) / SUN_INTENSITY_MAX;
 }

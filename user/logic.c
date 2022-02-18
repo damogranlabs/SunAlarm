@@ -54,6 +54,7 @@ void _set_alarm_defaults(void)
     cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
     cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
     cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
+    cfg_data.intensity_resolution = get_sun_intensity_resolution();
   }
 }
 

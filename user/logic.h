@@ -37,6 +37,7 @@ typedef struct configuration_t
   // used for setting alarm sun intensity (avoid re-calculating these static values all the time)
   uint32_t sun_intensity_max_precise;
   uint32_t wakeup_time_ms;
+  uint32_t intensity_resolution;
 } configuration_t;
 
 typedef struct runtime_data_t
