@@ -5,7 +5,7 @@
  * @source  http://damogranlabs.com/
  *          https://github.com/damogranlabs
  */
-#include "stdint.h"
+#include <stdint.h>
 
 #include "buttons.h"
 #include "buttons_user.h"
@@ -13,12 +13,21 @@
 // add custom includes here to access required defines, cpu-specific LL functions, ...
 #include "main.h"
 
-// TODO
 #include "lcd.h"
 
 #include "logic.h"
 #include "sun_ctrl.h"
 #include "display_ctrl.h"
+
+/**
+ * @brief Get current system milliseconds (systick) value (usually started at system reset).
+ * @retval Milliseconds value.
+ * TODO: user must implement this function to return milliseconds (systick) value.
+ */
+uint32_t get_milliseconds(void)
+{
+  return GetTick();
+}
 
 /**
  * @brief Low level call to get actual pin state.
@@ -116,5 +125,23 @@ void on_button_longpress(btn_cfg_t *btn_cfg)
     // in setup mode: exit setup mode and enable LCD backlight with timeout
     ctrl_lcd_backlight(true, setup_mode);
     set_setup_mode(!setup_mode);
+  }
+}
+
+/**
+ * @brief On release (short, repetitive or longpress) button callback.
+ * @param *btn_cfg Button configuration structure that triggered the event.
+ * @param state: button state before release event was triggered.
+ * @retval None.
+ * TODO: user can add actions on button events here.
+ */
+void on_button_release(btn_cfg_t *btn_cfg, btn_state_t state)
+{
+  if ((btn_cfg->gpio_port == B_SETUP_Port) && (btn_cfg->gpio_pin == B_SETUP_Pin))
+  {
+    if (state == BTN_STATE_LONGPRESS)
+    {
+      // printString("B1 press release");
+    }
   }
 }

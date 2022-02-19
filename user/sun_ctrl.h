@@ -10,7 +10,6 @@
 #define SUN_TIM TIM1
 #define SUN_TIM_CH LL_TIM_CHANNEL_CH4
 
-#define SUN_INTENSITY_MIN 0
 #define SUN_INTENSITY_MAX 100
 
 void sun_init(void);
@@ -19,6 +18,7 @@ void sun_pwr_on(void);
 void sun_pwr_off(void);
 void sun_pwr_on_manual(void);
 
+uint8_t sun_get_intensity(void);
 void sun_set_intensity(uint8_t intensity);
 void sun_set_intensity_precise(uint32_t intensity);
 

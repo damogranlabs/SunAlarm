@@ -20,6 +20,7 @@
 void _set_alarm_defaults(void);
 void _set_alarm_start_time(void);
 void _handle_alarm_time(void);
+void _handle_current_intensity(void);
 
 void _handle_setup(bool force_refresh);
 void _handle_setup_alarm_time(void);
@@ -36,6 +37,8 @@ sm_area_t sm_area;
 configuration_t cfg_data;
 runtime_data_t runtime_data;
 rot_enc_data_t encoder;
+button_t *btn_setup;
+button_t *btn_light;
 
 volatile bool rtc_event = false;
 
@@ -128,6 +131,14 @@ void handle_interactions(void)
     else
     {
       _handle_setup(false);
+    }
+  }
+  else if (is_button_still_pressed(btn_light))
+  {
+    if (is_sun_enabled())
+    {
+      // light button still pressed while sun light is ON. Modify intensity with encoder.
+      _handle_current_intensity();
     }
   }
   else if (is_alarm_enabled())
@@ -290,11 +301,36 @@ void _handle_alarm_time(void)
   // alarm is set in minutes
   if (count != 0)
   {
+    count *= ALARM_TIME_MOD_FACTOR;
     _manipulate_time(&cfg_data.alarm_time[H_POS], &cfg_data.alarm_time[M_POS], count);
     _set_alarm_start_time();
 
     show_alarm_state();
     ctrl_lcd_backlight(true, true);
+  }
+}
+// modify current intensity with encoder, but don't toggle default nightlight indensity value
+void _handle_current_intensity(void)
+{
+  int16_t intensity;
+  int16_t count = rot_enc_get_count(&encoder);
+  if (count != 0)
+  {
+    intensity = (int16_t)sun_get_intensity();
+    count *= SUN_INTENSITY_MOD_FACTOR;
+
+    if ((intensity + count) <= 0)
+    {
+      sun_set_intensity(0);
+    }
+    else if ((intensity + count) > SUN_INTENSITY_MAX)
+    {
+      sun_set_intensity(SUN_INTENSITY_MAX);
+    }
+    else
+    {
+      sun_set_intensity((uint8_t)(intensity + count));
+    }
   }
 }
 
@@ -305,6 +341,7 @@ void _handle_setup_wakeup_time(bool force_refresh)
   int32_t count = rot_enc_get_count(&encoder);
   if ((count != 0) || (force_refresh == true))
   {
+    count *= WAKEUP_TIME_MOD_FACTOR;
     if ((cfg_data.wakeup_time_min + count) > 255)
     {
       cfg_data.wakeup_time_min = 255;

@@ -50,6 +50,8 @@
 /* USER CODE BEGIN PV */
 extern volatile bool rtc_event;
 extern rot_enc_data_t encoder;
+extern button_t *btn_setup;
+extern button_t *btn_light;
 
 volatile uint32_t systick_counter = 0;
 /* USER CODE END PV */
@@ -102,8 +104,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   LL_SYSTICK_EnableIT();
 
-  register_button(B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
-  register_button(B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
+  btn_setup = register_button(B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
+  btn_light = register_button(B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_SINGLEPRESS);
 
   rot_enc_init(&encoder, ENC_A_GPIO_Port, ENC_A_Pin, ENC_B_GPIO_Port, ENC_B_Pin);
   rot_enc_set_direction(&encoder, ROT_ENC_INC_CCW);

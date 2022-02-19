@@ -8,6 +8,8 @@ extern configuration_t cfg_data;
 
 uint16_t _scale_intensity_to_lut(uint32_t intensity);
 
+uint8_t _last_user_sun_intensity;
+
 // clang-format off
 // Gamma brightness lookup table <https://victornpb.github.io/gamma-table-generator>
 // gamma = 3.30 steps = 1500 range = 0-65535
@@ -138,9 +140,16 @@ void sun_pwr_on_manual(void)
 void sun_set_intensity(uint8_t intensity)
 {
   // percent to value conversion (up to SUN_INTENSITY_MAX)
+  _last_user_sun_intensity = intensity;
   uint32_t compare_val = get_sun_intensity_value(intensity);
 
   LL_TIM_OC_SetCompareCH4(SUN_TIM, _scale_intensity_to_lut(compare_val));
+}
+
+uint8_t sun_get_intensity(void)
+{
+  // return last intensity that was set via `set_sun_intensity()`
+  return _last_user_sun_intensity;
 }
 
 uint16_t _scale_intensity_to_lut(uint32_t intensity)

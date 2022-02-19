@@ -3,13 +3,13 @@
  * @date    30-May-2020
  * @author  Domen Jurkovic
  * @source  http://damogranlabs.com/
- *          https://github.com/damogranlabs
+ *          https://github.com/damogranlabs/Embedded-device-utilities-in-C
  */
 #ifndef __BUTTONS_H
 #define __BUTTONS_H
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "buttons_user.h"
 
@@ -53,8 +53,14 @@ typedef struct
 void handle_buttons(void);
 
 button_t *register_button(BTN_GPIO_PORT_TYPE *port, BTN_GPIO_PIN_TYPE pin, btn_press_mode_t press_mode);
+
+uint32_t get_milliseconds(void);
 btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg);
+
+bool is_button_still_pressed(button_t *btn);
+
 void on_button_press(btn_cfg_t *btn_cfg);
 void on_button_longpress(btn_cfg_t *btn_cfg);
+void on_button_release(btn_cfg_t *btn_cfg, btn_state_t state);
 
 #endif
