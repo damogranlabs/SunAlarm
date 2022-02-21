@@ -194,6 +194,7 @@ void handle_alarm(void)
         if (m == runtime_data.alarm_start_time[M_POS])
         {
           // its is wake up time!
+          ctrl_lcd_backlight(true, false); // keep the LCD backlight ON
           set_alarm_active(true);
           handle_alarm_intensity(true);
           sun_pwr_on();
