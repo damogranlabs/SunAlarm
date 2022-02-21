@@ -114,13 +114,14 @@ const uint16_t gamma_lut[LUT_SIZE] = {
 
 void sun_init(void)
 {
-  LL_TIM_SetCounter(SUN_TIM, 0);
   sun_set_intensity(cfg_data.sun_manual_intensity);
+  LL_TIM_SetCounter(SUN_TIM, 0);
   LL_TIM_EnableAllOutputs(SUN_TIM);
 }
 
 void sun_pwr_on(void)
 {
+  LL_TIM_SetCounter(SUN_TIM, 0);
   LL_TIM_CC_EnableChannel(SUN_TIM, SUN_TIM_CH);
   LL_TIM_EnableCounter(SUN_TIM);
 }
@@ -139,33 +140,51 @@ void sun_pwr_on_manual(void)
 
 void sun_set_intensity(uint8_t intensity)
 {
-  // percent to value conversion (up to SUN_INTENSITY_MAX)
-  _last_user_sun_intensity = intensity;
-  uint32_t compare_val = get_sun_intensity_value(intensity);
+  // percent to value conversion
+  // intensity: 0 ... 100 (SUN_INTENSITY_MAX)
+  uint32_t compare_val = 0;
 
-  LL_TIM_OC_SetCompareCH4(SUN_TIM, _scale_intensity_to_lut(compare_val));
+  _last_user_sun_intensity = intensity;
+  if (intensity)
+  {
+    compare_val = _scale_intensity_to_lut(get_sun_intensity_value(intensity));
+  }
+  LL_TIM_OC_SetCompareCH4(SUN_TIM, compare_val);
 }
 
 uint8_t sun_get_intensity(void)
 {
   // return last intensity that was set via `set_sun_intensity()`
+  // return: 0 ... SUN_INTENSITY_MAX
   return _last_user_sun_intensity;
 }
 
 uint16_t _scale_intensity_to_lut(uint32_t intensity)
 {
   // scale intensity range to length of LUT
-  uint32_t idx_in_lut = (intensity * LUT_SIZE) / cfg_data.intensity_resolution;
+  // intensity 0 ... (cfg_data.intensity_resolution -1)
+  // return: LUT[0] ... LUT[-1]
+  uint16_t idx_in_lut = (intensity * LUT_SIZE) / cfg_data.intensity_resolution;
 
-  return gamma_lut[idx_in_lut - 1];
+  return gamma_lut[idx_in_lut];
 }
 
 void sun_set_intensity_precise(uint32_t intensity)
 {
-  LL_TIM_OC_SetCompareCH4(SUN_TIM, _scale_intensity_to_lut(intensity));
+  // 0 ... cfg_data.intensity_resolution -1
+  uint32_t compare_val = 0;
+
+  if (intensity)
+  {
+    compare_val = _scale_intensity_to_lut(intensity);
+  }
+  LL_TIM_OC_SetCompareCH4(SUN_TIM, compare_val);
 }
 
 uint32_t get_sun_intensity_value(uint8_t user_intensity)
 {
-  return (cfg_data.intensity_resolution * (uint32_t)user_intensity) / SUN_INTENSITY_MAX;
+  // user_intensity: 1 ... 100 (SUN_INTENSITY_MAX)
+  // return: cfg_data.intensity_resolution/SUN_INTENSITY_MAX -1  ... cfg_data.intensity_resolution -1
+
+  return ((cfg_data.intensity_resolution * (uint32_t)user_intensity) / SUN_INTENSITY_MAX) - 1;
 }

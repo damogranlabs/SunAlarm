@@ -57,8 +57,9 @@ void _set_alarm_defaults(void)
     cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
     cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
     cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
-    cfg_data.intensity_resolution = get_sun_intensity_resolution();
   }
+  cfg_data.intensity_resolution = get_sun_intensity_resolution();
+  cfg_data.sun_intensity_max_precise = get_sun_intensity_value(cfg_data.sun_intensity_max);
 }
 
 void set_defaults(void)
@@ -208,9 +209,9 @@ void handle_alarm_intensity(bool restart)
   {
     cfg_data.sun_intensity_max_precise = get_sun_intensity_value(cfg_data.sun_intensity_max);
     cfg_data.wakeup_time_ms = ((uint32_t)cfg_data.wakeup_time_min) * 60 * 1000;
-
-    runtime_data.last_alarm_intensity_timestamp = GetTick();
     runtime_data.alarm_start_timestamp = GetTick();
+    sun_set_intensity_precise(_get_alarm_sun_intensity());
+    runtime_data.last_alarm_intensity_timestamp = GetTick();
   }
 
   if (GetTick() > runtime_data.last_alarm_intensity_timestamp)

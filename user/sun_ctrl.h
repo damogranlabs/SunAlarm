@@ -31,7 +31,7 @@ static inline bool is_sun_enabled(void)
 
 static inline uint32_t get_sun_intensity_resolution(void)
 {
-    return LL_TIM_GetAutoReload(SUN_TIM);
+    return LL_TIM_GetAutoReload(SUN_TIM) + 1; // +1: from 0 up to ARR
 }
 
 #endif /* SUN_CTRL_H_ */
