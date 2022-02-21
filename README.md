@@ -10,4 +10,4 @@ Setup button:
 
 Light button:
 * Single press: toggle night light on/off; Rot. encoder: / OR changes alarm time if alarm is enabled
-* Holding button and rotating rot. encoder: changes current indensity value, if light is enabled
+* Holding button and rotating rot. encoder: changes current intensity value, if light is enabled
