@@ -230,8 +230,8 @@ uint32_t _get_alarm_sun_intensity(void)
   // time is time that intensity is searched for in msec
   // note: final function is written just a bit different to avoid division errors
   //       because of rounding (integers instead of floats)
-  volatile uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
-  volatile uint32_t intensity = (uint32_t)((((uint64_t)cfg_data.sun_intensity_max_precise * (uint64_t)time_ms) / (uint64_t)cfg_data.wakeup_time_ms));
+  uint32_t time_ms = GetTick() - runtime_data.alarm_start_timestamp;
+  uint32_t intensity = (uint32_t)((((uint64_t)cfg_data.sun_intensity_max_precise * (uint64_t)time_ms) / (uint64_t)cfg_data.wakeup_time_ms));
   if (intensity > cfg_data.sun_intensity_max_precise)
   {
     return cfg_data.sun_intensity_max_precise;
