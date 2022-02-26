@@ -67,6 +67,7 @@ void set_defaults(void)
   _set_alarm_defaults();
 
   runtime_data.is_setup_mode = false;
+  runtime_data.is_alarm_time_setup_mode = false;
   runtime_data.is_alarm_active = false;
   runtime_data.alarm_start_timestamp = 0;
   runtime_data.last_alarm_intensity_timestamp = 0;
@@ -81,7 +82,6 @@ void set_setup_mode(bool is_enabled)
   if (is_enabled)
   {
     sm_area = SETUP_WAKEUP_TIME;
-    rot_enc_reset_count(&encoder);
     runtime_data.setup_mode_end_timestamp = GetTick() + (SETUP_MODE_TIMEOUT_SEC * 1000);
 
     get_current_time(&cfg_data.time[H_POS], &cfg_data.time[M_POS], NULL);
@@ -108,6 +108,21 @@ bool is_setup_mode(void)
   return runtime_data.is_setup_mode;
 }
 
+void set_alarm_time_setup_mode(bool is_enabled)
+{
+  runtime_data.is_alarm_time_setup_mode = is_enabled;
+  if (is_enabled)
+  {
+    runtime_data.setup_mode_end_timestamp = GetTick() + (SETUP_MODE_TIMEOUT_SEC * 1000);
+  }
+  show_alarm_state();
+}
+
+bool is_alarm_time_setup_mode(void)
+{
+  return runtime_data.is_alarm_time_setup_mode;
+}
+
 void update_settings(void)
 {
   sm_area++;
@@ -116,36 +131,71 @@ void update_settings(void)
     sm_area = SETUP_WAKEUP_TIME;
   }
 
-  rot_enc_reset_count(&encoder);
-
   _handle_setup(true);
 }
 
 void handle_interactions(void)
 {
-  if (is_setup_mode())
+  /* Runtime interactions:
+  Light btn        |   Setup btn     |   Encoder changes
+  -----------------+-----------------+------------------
+          /        |       /         | If light is enabled: vary light intensity.
+                   |                 | If alarm & display is enabled, vary alarm time.
+                   |                 | In alarm time setup mode: vary setup item value.
+                   |                 | Else: ignore.
+  -----------------+-----------------+-----------------------------------------------
+       press       |       /         |         /     -> light button toggle display and then light at manual intensity.
+                   |                 |               -> In setup mode: ignore.
+                   |                 |               -> In alarm time setup mode: disable alarm time setup mode.
+  -----------------+-----------------+-----------------------------------------------
+      long press   |       /         |         /     -> if not in setup mode: enable alarm time setup mode.
+  -----------------+-----------------+-----------------------------------------------
+         /         |     press       |         /     -> If alarm is active: deactivate alarm.
+                   |                 |                  Else: toggle alarm state.
+                   |                 |               -> In setup mode: move to the next menu item.
+  -----------------+-----------------+-----------------------------------------------
+         /         |   long press    |         /     -> Enter/exit alarm setup mode.
+  -----------------+-----------------+-----------------------------------------------
+  */
+  bool setup_mode = is_setup_mode();
+  bool alarm_time_setup_mode = is_alarm_time_setup_mode();
+  bool menu_timeout = false;
+
+  if (GetTick() > runtime_data.setup_mode_end_timestamp)
   {
-    if (GetTick() > runtime_data.setup_mode_end_timestamp)
+    menu_timeout = true;
+  }
+
+  if (setup_mode)
+  {
+    if (menu_timeout)
     {
       set_setup_mode(false);
+      ctrl_lcd_backlight(true, true);
     }
     else
     {
       _handle_setup(false);
     }
   }
-  else if (is_button_still_pressed(btn_light))
+  else if (alarm_time_setup_mode)
+  {
+    if (menu_timeout)
+    {
+      set_alarm_time_setup_mode(false);
+      ctrl_lcd_backlight(true, true);
+    }
+    else
+    {
+      _handle_alarm_time();
+    }
+  }
+  else
   {
     if (is_sun_enabled())
     {
-      // light button still pressed while sun light is ON. Modify intensity with encoder.
       _handle_current_intensity();
     }
-  }
-  else if (is_alarm_enabled())
-  {
-    // alarm time is updated here via rotary encoder, while alarm state (on/off) is toggled and handled via button
-    _handle_alarm_time();
   }
 }
 
@@ -308,7 +358,6 @@ void _handle_alarm_time(void)
     _set_alarm_start_time();
 
     show_alarm_state();
-    ctrl_lcd_backlight(true, true);
   }
 }
 // modify current intensity with encoder, but don't toggle default nightlight indensity value

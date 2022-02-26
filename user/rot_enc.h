@@ -5,11 +5,14 @@
  * @date    13-Feb-2021
  * @author  Domen Jurkovic, Damogran Labs
  * @source  http://damogranlabs.com/
- *          https://github.com/damogranlabs
+ *          https://github.com/damogranlabs/Embedded-device-utilities-in-C
  * @version v1.1
  */
 #ifndef __ROT_ENC_H
 #define __ROT_ENC_H
+
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "rot_enc_user.h"
 
@@ -27,10 +30,10 @@ typedef struct
   ROT_ENC_GPIO_PIN_TYPE pin_B;
 
   rot_enc_inc_dir_t inc_dir; //  Increment direction (CW or CCW)
-  int32_t volatile abs_rot;  //  Absolute rotation from beginning
-  int32_t volatile diff_rot; //  Difference in rotation from last check
+  volatile int32_t abs_rot;  //  Absolute rotation from beginning
+  volatile int32_t diff_rot; //  Difference in rotation from last check
 
-  //private
+  // private
   bool _last_pin_A_state; //  Last state of pin A
 } rot_enc_data_t;
 
@@ -43,6 +46,7 @@ void rot_enc_set_direction(rot_enc_data_t *re_data, rot_enc_inc_dir_t re_dir);
 
 volatile int32_t rot_enc_get_count(rot_enc_data_t *re_data);
 volatile int32_t rot_enc_get_abs_count(rot_enc_data_t *re_data);
+bool rot_enc_is_changed(rot_enc_data_t *re_data);
 void rot_enc_reset_count(rot_enc_data_t *re_data);
 void rot_enc_reset_abs_count(rot_enc_data_t *re_data);
 

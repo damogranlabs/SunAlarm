@@ -38,6 +38,7 @@ typedef struct
   BTN_GPIO_PORT_TYPE *gpio_port;
   BTN_GPIO_PIN_TYPE gpio_pin;
   btn_press_mode_t press_mode;
+  bool generate_release_event;
 } btn_cfg_t;
 
 typedef struct
@@ -59,8 +60,8 @@ btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg);
 
 bool is_button_still_pressed(button_t *btn);
 
-void on_button_press(btn_cfg_t *btn_cfg);
-void on_button_longpress(btn_cfg_t *btn_cfg);
-void on_button_release(btn_cfg_t *btn_cfg, btn_state_t state);
+void on_button_press(button_t *btn);
+void on_button_longpress(button_t *btn);
+void on_button_release(button_t *btn, btn_state_t state);
 
 #endif

@@ -20,7 +20,9 @@
 
 // time and alarm active status position
 #define T_A_Y 0
-#define A_LCD_POSITION 0 // LCD internal storage position index
+// LCD internal storage position index
+#define A_ACTIVE_LCD_POS 0
+#define A_TIME_SETUP_LCD_POS 1
 
 // alarm time info position
 #define A_SETTINGS_Y 1
@@ -43,10 +45,11 @@
 void _print_time(uint8_t y, uint8_t x, uint8_t *h, uint8_t *m, uint8_t *s);
 
 extern configuration_t cfg_data;
+extern runtime_data_t runtime_data;
 
 static uint32_t lcd_off_timestamp;
 
-// https://www.makerguides.com/character-lcd-arduino-tutorial/
+// https://maxpromer.github.io/LCD-Character-Creator/
 static uint8_t alarm_active_icon[] = {0b00100,
                                       0b01110,
                                       0b01110,
@@ -55,10 +58,19 @@ static uint8_t alarm_active_icon[] = {0b00100,
                                       0b00000,
                                       0b00100,
                                       0b00000};
+static uint8_t alarm_time_setup_icon[] = {0b00000,
+                                          0b00000,
+                                          0b00100,
+                                          0b00110,
+                                          0b11111,
+                                          0b00110,
+                                          0b00100,
+                                          0b00000};
 
-void create_alarm_status_icon(void)
+void create_status_icons(void)
 {
-  lcd_create_char(A_LCD_POSITION, alarm_active_icon);
+  lcd_create_char(A_ACTIVE_LCD_POS, alarm_active_icon);
+  lcd_create_char(A_TIME_SETUP_LCD_POS, alarm_time_setup_icon);
 }
 
 void show_default(void)
@@ -83,7 +95,7 @@ void show_alarm_active(void)
   lcd_clear_area(T_A_Y, 0, 1);
   if (is_alarm_active())
   {
-    lcd_put_char(T_A_Y, 0, A_LCD_POSITION);
+    lcd_put_char(T_A_Y, 0, A_ACTIVE_LCD_POS);
   }
 }
 
@@ -104,6 +116,10 @@ void show_alarm_state()
   if (cfg_data.is_alarm_enabled)
   {
     lcd_print_str(A_SETTINGS_Y, A_SETTINGS_X, A_ON_TEXT);
+    if (runtime_data.is_alarm_time_setup_mode)
+    {
+      lcd_put_char(A_SETTINGS_Y, LCD_X_SIZE - TIME_HM_STR_SIZE, A_TIME_SETUP_LCD_POS);
+    }
     _print_time(A_SETTINGS_Y,
                 LCD_X_SIZE - TIME_HM_STR_SIZE + 1,
                 &cfg_data.alarm_time[H_POS],

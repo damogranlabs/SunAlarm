@@ -72,7 +72,7 @@ void rot_enc_set_direction(rot_enc_data_t *re_data, rot_enc_inc_dir_t re_dir)
 }
 
 /**
- * @brief Get difference from the last time this funciton was called.
+ * @brief Get difference from the last time this function was called.
  * @param Rotary encoder data
  * @retval Difference from the last time this function was called.
  */
@@ -85,7 +85,7 @@ volatile int32_t rot_enc_get_count(rot_enc_data_t *re_data)
 }
 
 /**
- * @brief Get absoulute count.
+ * @brief Get absolute count.
  * @param Rotary encoder data
  * @retval Absolute count value.
  */
@@ -93,6 +93,23 @@ volatile int32_t rot_enc_get_abs_count(rot_enc_data_t *re_data)
 {
   return re_data->abs_rot;
 }
+
+/**
+ * @brief Return true if there were rotation of rotary encoder that were not yet
+ *        handled by `rot_enc_get_*_count()` function.
+ * @param Rotary encoder data
+ * @retval True if unhandled changes are registered, false otherwise.
+ */
+bool rot_enc_is_changed(rot_enc_data_t *re_data)
+{
+  return ((bool)re_data->diff_rot);
+}
+
+/**
+ * @brief Get absolute count.
+ * @param Rotary encoder data
+ * @retval Absolute count value.
+ */
 
 /**
  * @brief Reset internal count value from the last read to zero. Absolute count is left intact.

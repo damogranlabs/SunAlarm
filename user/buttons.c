@@ -104,7 +104,10 @@ void handle_buttons(void)
         else
         {
           // state != IDLE, reset button tracking
-          on_button_release(&btn->button_cfg, btn->button_state);
+          if (&btn->button_cfg.generate_release_event)
+          {
+            on_button_release(&btn->button_cfg, btn->button_state);
+          }
           btn->button_state = BTN_STATE_IDLE;
           btn->first_change_timestamp = 0;
           btn->last_event_timestamp = timestamp; // avoid immediate re-trigger on phy on->off glitches
@@ -150,6 +153,7 @@ button_t *register_button(BTN_GPIO_PORT_TYPE *port, BTN_GPIO_PIN_TYPE pin, btn_p
   _buttons[_num_of_registered_buttons].first_change_timestamp = 0;
   _buttons[_num_of_registered_buttons].button_phy_state = get_button_pin_state(
       &_buttons[_num_of_registered_buttons].button_cfg);
+  _buttons[_num_of_registered_buttons].button_cfg.generate_release_event = true;
 
   _num_of_registered_buttons++;
 
