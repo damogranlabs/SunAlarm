@@ -95,6 +95,8 @@ const uint16_t gamma_lut[LUT_SIZE] = {
 
 void sun_init(void)
 {
+  LL_TIM_EnableUpdateEvent(SUN_TIM);
+
   sun_set_intensity(cfg_data.sun_manual_intensity);
   LL_TIM_SetCounter(SUN_TIM, 0);
   LL_TIM_EnableAllOutputs(SUN_TIM);
@@ -102,6 +104,7 @@ void sun_init(void)
 
 void sun_pwr_on(void)
 {
+  LL_TIM_GenerateEvent_UPDATE(SUN_TIM);
   LL_TIM_SetCounter(SUN_TIM, 0);
   LL_TIM_CC_EnableChannel(SUN_TIM, SUN_TIM_CH);
   LL_TIM_EnableCounter(SUN_TIM);
