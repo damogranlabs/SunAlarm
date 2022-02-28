@@ -360,7 +360,7 @@ void _handle_alarm_time(void)
     show_alarm_state();
   }
 }
-// modify current intensity with encoder, but don't toggle default nightlight indensity value
+// modify current intensity with encoder, but don't toggle default nightlight intensity value
 void _handle_current_intensity(void)
 {
   int16_t intensity;
