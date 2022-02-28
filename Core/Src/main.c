@@ -118,6 +118,16 @@ int main(void)
   set_defaults();
   sun_init();
   show_alarm_state();
+
+  /*
+  // just for debugging
+  extern configuration_t cfg_data;
+  set_new_time(6, 18, 54);
+  cfg_data.wakeup_time_min = 1;
+  cfg_data.alarm_time[0] = 6;
+  cfg_data.alarm_time[1] = 20;
+  set_alarm_state(true);
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
