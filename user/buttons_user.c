@@ -3,7 +3,7 @@
  * @date    30-May-2020
  * @author  Domen Jurkovic
  * @source  http://damogranlabs.com/
- *          https://github.com/damogranlabs
+ *          https://github.com/damogranlabs/Embedded-device-utilities-in-C/Embedded-device-utilities-in-C
  */
 #include <stdint.h>
 
@@ -27,20 +27,20 @@ extern rot_enc_data_t encoder;
  * @retval Milliseconds value.
  * TODO: user must implement this function to return milliseconds (systick) value.
  */
-uint32_t get_milliseconds(void)
+uint32_t btn_get_milliseconds(void)
 {
   return GetTick();
 }
 
 /**
  * @brief Low level call to get actual pin state.
- * @param *btn_cfg Registered button configuration structure.
+ * @param cfg: Registered button configuration structure.
  * @retval BTN_PHY_ACTIVE on button press, BTN_PHY_IDLE otherwise.
  * TODO: user must implement this function to return button state.
  */
-btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg)
+btn_phy_state_t btn_get_pin_state(btn_cfg_t *cfg)
 {
-  uint32_t pin_state = LL_GPIO_IsInputPinSet(btn_cfg->gpio_port, btn_cfg->gpio_pin);
+  uint32_t pin_state = LL_GPIO_IsInputPinSet(cfg->gpio_port, cfg->gpio_pin);
 
   if (pin_state == 0)
   {
@@ -53,12 +53,11 @@ btn_phy_state_t get_button_pin_state(btn_cfg_t *btn_cfg)
 }
 
 /**
- * @brief On press (short, repetitive) button callback
- * @param *btn Button configuration structure that triggered the event.
- * @retval None.
+ * @brief On press (short, repetitive) button callback.
+ * @param btn: Button configuration structure that triggered the event.
  * TODO: user can add actions on button events here.
  */
-void on_button_press(button_t *btn)
+void btn_on_press(button_t *btn)
 {
   // interactions and button handlings are described in logic.c -> handle_interactions()
   bool setup_mode = is_setup_mode();
@@ -66,7 +65,7 @@ void on_button_press(button_t *btn)
   bool alarm_enabled = is_alarm_enabled();
   rot_enc_reset_count(&encoder);
 
-  if ((btn->button_cfg.gpio_port == B_SETUP_Port) && (btn->button_cfg.gpio_pin == B_SETUP_Pin))
+  if ((btn->cfg.gpio_port == B_SETUP_Port) && (btn->cfg.gpio_pin == B_SETUP_Pin))
   {
     if (is_alarm_active())
     {
@@ -90,7 +89,7 @@ void on_button_press(button_t *btn)
       }
     }
   }
-  else if ((btn->button_cfg.gpio_port == B_LA_CTRL_Port) && (btn->button_cfg.gpio_pin == B_LA_CTRL_Pin))
+  else if ((btn->cfg.gpio_port == B_LA_CTRL_Port) && (btn->cfg.gpio_pin == B_LA_CTRL_Pin))
   {
     if (!setup_mode)
     {
@@ -125,24 +124,23 @@ void on_button_press(button_t *btn)
 
 /**
  * @brief On press (long) button callback
- * @param *btn Button configuration structure that triggered the event.
- * @retval None.
+ * @param btn Button configuration structure that triggered the event.
  * TODO: user can add actions on button events here.
  */
-void on_button_longpress(button_t *btn)
+void btn_on_longpress(button_t *btn)
 {
   // interactions and button handlings are described in logic.c -> handle_interactions()
   bool setup_mode = is_setup_mode();
   bool alarm_time_setup_mode = is_alarm_time_setup_mode();
 
   rot_enc_reset_count(&encoder);
-  if ((btn->button_cfg.gpio_port == B_SETUP_Port) && (btn->button_cfg.gpio_pin == B_SETUP_Pin))
+  if ((btn->cfg.gpio_port == B_SETUP_Port) && (btn->cfg.gpio_pin == B_SETUP_Pin))
   {
     set_alarm_active(false);
     set_setup_mode(!setup_mode);
     ctrl_lcd_backlight(true, setup_mode);
   }
-  else if ((btn->button_cfg.gpio_port == B_LA_CTRL_Port) && (btn->button_cfg.gpio_pin == B_LA_CTRL_Pin))
+  else if ((btn->cfg.gpio_port == B_LA_CTRL_Port) && (btn->cfg.gpio_pin == B_LA_CTRL_Pin))
   {
     if (!(setup_mode || alarm_time_setup_mode))
     {
@@ -157,14 +155,12 @@ void on_button_longpress(button_t *btn)
 
 /**
  * @brief On release (short, repetitive or longpress) button callback.
- * @param *btn Button configuration structure that triggered the event.
- * @param state: button state before release event was triggered.
- * @retval None.
+ * @param btn Button configuration structure that triggered the event.
  * TODO: user can add actions on button events here.
  */
-void on_button_release(button_t *btn, btn_state_t state)
+void btn_on_release(button_t *btn)
 {
-  if ((btn->button_cfg.gpio_port == B_LA_CTRL_Port) && (btn->button_cfg.gpio_pin == B_LA_CTRL_Pin))
+  if ((btn->cfg.gpio_port == B_LA_CTRL_Port) && (btn->cfg.gpio_pin == B_LA_CTRL_Pin))
   {
   }
 }

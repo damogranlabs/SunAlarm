@@ -37,8 +37,7 @@ sm_area_t sm_area;
 configuration_t cfg_data;
 runtime_data_t runtime_data;
 rot_enc_data_t encoder;
-button_t *btn_setup;
-button_t *btn_light;
+button_t buttons[NUM_OF_BUTTONS];
 
 volatile bool rtc_event = false;
 

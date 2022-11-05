@@ -3,7 +3,7 @@
  * @date    30-May-2020
  * @author  Domen Jurkovic
  * @source  http://damogranlabs.com/
- *          https://github.com/damogranlabs
+ *          https://github.com/damogranlabs/Embedded-device-utilities-in-C
  */
 #ifndef __BUTTONS_USER_H
 #define __BUTTONS_USER_H
@@ -14,7 +14,7 @@
 #include "stm32f0xx_ll_gpio.h"
 #include "main.h"
 
-#define NUM_OF_BUTTONS 5 // number max registered buttons
+#define NUM_OF_BUTTONS 2 // number max registered buttons
 
 // define GPIO port/pin object type
 #define BTN_GPIO_PORT_TYPE GPIO_TypeDef

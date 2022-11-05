@@ -50,14 +50,16 @@
 /* USER CODE BEGIN PV */
 extern volatile bool rtc_event;
 extern rot_enc_data_t encoder;
-extern button_t *btn_setup;
-extern button_t *btn_light;
+extern button_t buttons[NUM_OF_BUTTONS];
 
 volatile uint32_t systick_counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
+void handle_systick_overflow(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -104,8 +106,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   LL_SYSTICK_EnableIT();
 
-  btn_setup = register_button(B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
-  btn_light = register_button(B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
+  btn_register(&buttons[0], B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
+  btn_register(&buttons[1], B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
 
   rot_enc_init(&encoder, ENC_A_GPIO_Port, ENC_A_Pin, ENC_B_GPIO_Port, ENC_B_Pin);
   rot_enc_set_direction(&encoder, ROT_ENC_INC_CCW);
@@ -140,6 +142,8 @@ int main(void)
       {
         show_time_and_alarm_active();
 
+        handle_systick_overflow();
+
         if (is_alarm_enabled())
         {
           handle_alarm();
@@ -153,7 +157,7 @@ int main(void)
       handle_alarm_intensity(false);
     }
 
-    handle_buttons();
+    btn_handle(buttons);
 
     handle_interactions();
 
@@ -213,6 +217,21 @@ void SystemClock_Config(void)
 uint32_t GetTick(void)
 {
   return systick_counter;
+}
+
+void handle_systick_overflow(void)
+{
+  // To avoid buttons deadlock every 49 days (systick 32-bit variable overflow),
+  // reset systick variable and other dependant variables on a pre-defined time
+  uint8_t h, m, s;
+
+  get_current_time(&h, &m, &s);
+  if ((h == SYSTICK_RESET_HOUR) && (m == SYSTICK_RESET_MIN) && (s == SYSTICK_RESET_SEC))
+  {
+    systick_counter = 0;
+    fix_lcd_backlight_time_on_systick_overflow();
+    btn_reset_timestamps(buttons);
+  }
 }
 /* USER CODE END 4 */
 
