@@ -31,6 +31,7 @@ void show_setup_item(sm_area_t sm_area, char *menu_str);
 
 void handle_lcd_backlight(void);
 void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight);
+void fix_lcd_backlight_time_on_systick_overflow(void);
 static inline bool is_lcd_backlight_enabled(void)
 {
     return !LL_GPIO_IsOutputPinSet(LCD_BACKLIGHT_Port, LCD_BACKLIGHT_Pin);

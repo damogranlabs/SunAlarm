@@ -199,6 +199,14 @@ void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
   }
 }
 
+void fix_lcd_backlight_time_on_systick_overflow(void)
+{
+  if (lcd_off_timestamp != 0)
+  {
+    lcd_off_timestamp = lcd_off_timestamp - GetTick();
+  }
+}
+
 void time_to_str(char *time_str, uint8_t *h, uint8_t *m, uint8_t *s)
 {
   // helper func
