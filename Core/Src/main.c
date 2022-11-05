@@ -106,8 +106,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   LL_SYSTICK_EnableIT();
 
-  btn_register(&buttons[0], B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
-  btn_register(&buttons[1], B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
+  btn_register(buttons, B_SETUP_Port, B_SETUP_Pin, BTN_MODE_LONGPRESS);
+  btn_register(buttons, B_LA_CTRL_Port, B_LA_CTRL_Pin, BTN_MODE_LONGPRESS);
 
   rot_enc_init(&encoder, ENC_A_GPIO_Port, ENC_A_Pin, ENC_B_GPIO_Port, ENC_B_Pin);
   rot_enc_set_direction(&encoder, ROT_ENC_INC_CCW);
