@@ -49,10 +49,10 @@ extern "C"
 #define RTC_SYNCHPRESCALER 8190
 
 #elif DOMENS_PCB
-// Each second is about 80us ahead.
-// That is about 6.9 second/per day, about 3.46 min/month (30 days)
+// Each second is about 20us behind.
+// That is about 1.7 second/per day, about 51.8 sec/month (30 days)
 #define RTC_ASYNCHPRESCALER 4
-#define RTC_SYNCHPRESCALER 8019
+#define RTC_SYNCHPRESCALER 8022
 
 #else
 #error "PCB not selected: missing RTC_ASYNCHPRESCALER and RTC_SYNCHPRESCALER settings (defines)."
