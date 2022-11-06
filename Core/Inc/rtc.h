@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    rtc.h
-  * @brief   This file contains all the function prototypes for
-  *          the rtc.c file
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    rtc.h
+ * @brief   This file contains all the function prototypes for
+ *          the rtc.c file
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __RTC_H__
@@ -39,32 +39,20 @@ extern "C"
 // RTC_ASYNCHPRESCALER: max 0x7F (127)
 // RTC_SYNCHPRESCALER: max 0x7FFF (32767)
 //
-// For the record: I have no idea how these prescalers affect the RTC clock. I couldn't figure out ho to reliably
+// For the record: I have no idea how these prescalers affect the RTC clock. I couldn't figure out how to reliably
 // predict the numbers, as measurements did not align with the reference manual and STM notes.
 // https://www.st.com/resource/en/application_note/an3371-using-the-hardware-realtime-clock-rtc-in-stm32-f0-f2-f3-f4-and-l1-series-of-mcus-stmicroelectronics.pdf
 #ifdef NEJCS_PCB
-// Each second is about 30us late.
-// That is about 2.6 second/per day. -> each 23 days, SunAlarm is 1 minute behind.
-#define RTC_ASYNCHPRESCALER 123
-#define RTC_SYNCHPRESCALER 329
+// Each second is about 40us ahead.
+// That is about 3.45 second/per day, about 1.7 min/month (30 days)
+#define RTC_ASYNCHPRESCALER 4
+#define RTC_SYNCHPRESCALER 8190
 
 #elif DOMENS_PCB
-// Each second is about 20us ahead.
-// That is about 19.7 second/per day. -> each 34 days, SunAlarm is 1 minute ahead.
-#define RTC_ASYNCHPRESCALER 50
-#define RTC_SYNCHPRESCALER 785
-// about 230us ahead
-//#define RTC_ASYNCHPRESCALER 122
-//#define RTC_SYNCHPRESCALER 325
-// about 600us late
-//#define RTC_ASYNCHPRESCALER 127
-//#define RTC_SYNCHPRESCALER 312
-// about 500us late
-//#define RTC_ASYNCHPRESCALER 125
-//#define RTC_SYNCHPRESCALER 317
-// about 900us ahead
-//#define RTC_ASYNCHPRESCALER 124
-//#define RTC_SYNCHPRESCALER 320
+// Each second is about 80us ahead.
+// That is about 6.9 second/per day, about 3.46 min/month (30 days)
+#define RTC_ASYNCHPRESCALER 4
+#define RTC_SYNCHPRESCALER 8019
 
 #else
 #error "PCB not selected: missing RTC_ASYNCHPRESCALER and RTC_SYNCHPRESCALER settings (defines)."
