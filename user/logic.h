@@ -63,6 +63,8 @@ void set_alarm_state(bool is_enabled);
 bool is_alarm_enabled(void);
 bool is_alarm_active(void);
 void set_alarm_active(bool is_active);
+bool is_alarm_timeout_pending(void);
+void reset_alarm_timeout_timestamp(void); // effectively disabling timeout period
 
 void set_setup_mode(bool is_enabled);
 bool is_setup_mode(void);

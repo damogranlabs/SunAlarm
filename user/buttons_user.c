@@ -105,6 +105,10 @@ void btn_on_press(button_t *btn)
           if (is_sun_enabled())
           {
             sun_pwr_off();
+            if (is_alarm_timeout_pending())
+            {
+              reset_alarm_timeout_timestamp();
+            }
             ctrl_lcd_backlight(false, false);
           }
           else

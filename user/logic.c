@@ -149,6 +149,7 @@ void handle_interactions(void)
        press       |       /         |         /     -> light button toggle display and then light at manual intensity.
                    |                 |               -> In setup mode: ignore.
                    |                 |               -> In alarm time setup mode: disable alarm time setup mode.
+                   |                 |               -> In alarm timeout period: disable alarm timeout period.
   -----------------+-----------------+-----------------------------------------------
       long press   |       /         |         /     -> if not in setup mode: enable alarm time setup mode.
   -----------------+-----------------+-----------------------------------------------
@@ -279,7 +280,7 @@ void handle_alarm_timeout(void)
 {
   if (is_sun_enabled())
   {
-    if (runtime_data.alarm_timeout_timestamp > 0)
+    if (is_alarm_timeout_pending())
     {
       if (GetTick() > runtime_data.alarm_timeout_timestamp)
       {
@@ -366,6 +367,23 @@ void set_alarm_active(bool is_active)
   runtime_data.is_alarm_active = is_active;
 
   show_alarm_active();
+}
+
+bool is_alarm_timeout_pending(void)
+{
+  if (runtime_data.alarm_timeout_timestamp == 0)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
+void reset_alarm_timeout_timestamp(void)
+{
+  runtime_data.alarm_timeout_timestamp = 0;
 }
 
 // modify alarm settings in the runtime
