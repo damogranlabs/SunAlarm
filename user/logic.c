@@ -54,6 +54,7 @@ void _set_alarm_defaults(void)
     cfg_data.alarm_time[H_POS] = DEFAULT_ALARM_TIME_H;
     cfg_data.alarm_time[M_POS] = DEFAULT_ALARM_TIME_M;
     cfg_data.wakeup_time_min = DEFAULT_WAKEUP_TIME_MIN;
+    cfg_data.wakeup_timeout_min = DEFAULT_WAKEUP_TIMEOUT_MIN;
     cfg_data.sun_intensity_max = DEFAULT_SUN_INTENSITY_MAX;
     cfg_data.sun_manual_intensity = DEFAULT_SUN_INTENSITY;
   }
@@ -69,6 +70,7 @@ void set_defaults(void)
   runtime_data.is_alarm_time_setup_mode = false;
   runtime_data.is_alarm_active = false;
   runtime_data.alarm_start_timestamp = 0;
+  runtime_data.alarm_timeout_timestamp = 0;
   runtime_data.last_alarm_intensity_timestamp = 0;
   runtime_data.setup_mode_end_timestamp = 0;
 
@@ -225,8 +227,9 @@ void handle_alarm(void)
         {
           // finish alarm
           set_alarm_active(false);
+          // do not power off. just let the user or timeout turn the sun/alarm off.
+          runtime_data.alarm_timeout_timestamp = GetTick() + (cfg_data.wakeup_timeout_min * 60 * 1000);
 
-          // do not power off. just let the user turn the sun/alarm off.
           return;
         }
       }
@@ -268,6 +271,21 @@ void handle_alarm_intensity(bool restart)
   {
     sun_set_intensity_precise(_get_alarm_sun_intensity());
     runtime_data.last_alarm_intensity_timestamp = GetTick();
+  }
+}
+
+void handle_alarm_timeout(void)
+{
+  if (is_sun_enabled())
+  {
+    if (runtime_data.alarm_timeout_timestamp > 0)
+    {
+      if (GetTick() > runtime_data.alarm_timeout_timestamp)
+      {
+        sun_pwr_off();
+        runtime_data.alarm_timeout_timestamp = 0;
+      }
+    }
   }
 }
 

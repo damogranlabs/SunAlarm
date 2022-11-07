@@ -5,7 +5,8 @@
 #include <stdbool.h>
 
 #define DEFAULT_WAKEUP_TIME_MIN 30
-#define WAKEUP_TIME_MOD_FACTOR 1
+#define DEFAULT_WAKEUP_TIMEOUT_MIN 1
+#define WAKEUP_TIME_MOD_FACTOR 1 // multiplier when wake up time is modified via encoder
 #define DEFAULT_SUN_INTENSITY_MAX SUN_INTENSITY_MAX
 #define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
 #define SUN_INTENSITY_MOD_FACTOR 10
@@ -33,6 +34,7 @@ typedef struct configuration_t
   uint8_t time[2];       //  HM
   uint8_t alarm_time[2]; //  HM
   uint8_t wakeup_time_min;
+  uint8_t wakeup_timeout_min;
   uint8_t sun_intensity_max;
   uint8_t sun_manual_intensity;
 
@@ -49,6 +51,7 @@ typedef struct runtime_data_t
   bool is_alarm_active;
   uint8_t alarm_start_time[2];             // HM
   uint32_t alarm_start_timestamp;          // msec
+  uint32_t alarm_timeout_timestamp;        // msec
   uint32_t last_alarm_intensity_timestamp; // msec
   uint32_t setup_mode_end_timestamp;       // msec
 
@@ -69,6 +72,7 @@ bool is_alarm_time_setup_mode(void);
 void handle_interactions(void);
 void handle_alarm(void);
 void handle_alarm_intensity(bool restart);
+void handle_alarm_timeout(void);
 
 void update_settings(void);
 

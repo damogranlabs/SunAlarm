@@ -126,6 +126,7 @@ int main(void)
   extern configuration_t cfg_data;
   set_new_time(6, 18, 54);
   cfg_data.wakeup_time_min = 1;
+  cfg_data.wakeup_timeout_min = 1;
   cfg_data.alarm_time[0] = 6;
   cfg_data.alarm_time[1] = 20;
   set_alarm_state(true);
@@ -152,11 +153,17 @@ int main(void)
 
       rtc_event = false;
     }
-    if (is_alarm_enabled() && is_alarm_active())
+    if (is_alarm_enabled())
     {
-      handle_alarm_intensity(false);
+      if (is_alarm_active())
+      {
+        handle_alarm_intensity(false);
+      }
+      else
+      {
+        handle_alarm_timeout();
+      }
     }
-
     btn_handle(buttons);
 
     handle_interactions();
