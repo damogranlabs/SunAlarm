@@ -199,7 +199,7 @@ void ctrl_lcd_backlight(bool is_enabled, bool auto_backlight)
   }
 }
 
-void fix_lcd_backlight_time_on_systick_overflow(void)
+void reset_lcd_backlight_time_on_systick_overflow(void)
 {
   if (lcd_off_timestamp != 0)
   {

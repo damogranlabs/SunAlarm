@@ -225,13 +225,22 @@ void handle_systick_overflow(void)
   // reset systick variable and other dependant variables on a pre-defined time
   uint8_t h, m, s;
 
-  get_current_time(&h, &m, &s);
-  if ((h == SYSTICK_RESET_HOUR) && (m == SYSTICK_RESET_MIN) && (s == SYSTICK_RESET_SEC))
+  // Skip procedure if alarm is active/setup mode
+  // (hopefully no one has their alarm/setup mode regularly set at such crazy times
+  if (!is_alarm_active())
   {
-    systick_counter = 0;
-    fix_lcd_backlight_time_on_systick_overflow();
-    btn_reset_timestamps(buttons);
+    if (!is_setup_mode())
+    {
+      get_current_time(&h, &m, &s);
+      if ((h == SYSTICK_RESET_HOUR) && (m == SYSTICK_RESET_MIN) && (s == SYSTICK_RESET_SEC))
+      {
+        reset_lcd_backlight_time_on_systick_overflow();
+        btn_reset_timestamps(buttons);
+        systick_counter = 0;
+      }
+    }
   }
+  // else: just try next day. once in 49 days will probably go through.
 }
 /* USER CODE END 4 */
 
