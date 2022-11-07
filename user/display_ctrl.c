@@ -38,6 +38,7 @@
 #define M_VALUE_X 0
 
 #define M_AREA_WAKEUP_TIME "Vzhod"
+#define M_AREA_WAKEUP_TIMEOUT "Ugasni po"
 #define M_AREA_SUN_INTENSITY "Sonce"
 #define M_AREA_SUN_MANUAL_INTENSITY "Nocna lucka"
 #define M_AREA_TIME "Ura"
@@ -139,6 +140,10 @@ void show_setup_item(sm_area_t sm_area, char *value_str)
   {
   case SETUP_WAKEUP_TIME:
     sprintf(setting_str, "@ %s (m):", M_AREA_WAKEUP_TIME);
+    break;
+
+  case SETUP_WAKEUP_TIMEOUT:
+    sprintf(setting_str, "@ %s (m):", M_AREA_WAKEUP_TIMEOUT);
     break;
 
   case SETUP_SUN_MAX_INTENSITY:

@@ -28,6 +28,7 @@ void _handle_setup_time(bool force_refresh, bool h_or_m);
 void _handle_setup_sun_intensity(bool force_refresh);
 void _handle_setup_sun_manual_intensity(bool force_refresh);
 void _handle_setup_wakeup_time(bool force_refresh);
+void _handle_setup_wakeup_timeout(bool force_refresh);
 
 uint32_t _get_alarm_sun_intensity(void);
 
@@ -319,6 +320,10 @@ void _handle_setup(bool force_refresh)
     _handle_setup_wakeup_time(force_refresh);
     break;
 
+  case SETUP_WAKEUP_TIMEOUT:
+    _handle_setup_wakeup_time(force_refresh);
+    break;
+
   case SETUP_SUN_MAX_INTENSITY:
     _handle_setup_sun_intensity(force_refresh);
     break;
@@ -423,6 +428,30 @@ void _handle_setup_wakeup_time(bool force_refresh)
       cfg_data.wakeup_time_min += count;
     }
     sprintf(time_str, "%d", cfg_data.wakeup_time_min);
+    show_setup_item(sm_area, &time_str[0]);
+  }
+}
+
+void _handle_setup_wakeup_timeout(bool force_refresh)
+{
+  char time_str[4]; // uint8_t + null char
+
+  int32_t count = rot_enc_get_count(&encoder);
+  if ((count != 0) || (force_refresh == true))
+  {
+    if ((cfg_data.wakeup_timeout_min + count) > 255)
+    {
+      cfg_data.wakeup_timeout_min = 255;
+    }
+    else if ((cfg_data.wakeup_timeout_min + count) < 0)
+    {
+      cfg_data.wakeup_timeout_min = 1;
+    }
+    else
+    {
+      cfg_data.wakeup_timeout_min += count;
+    }
+    sprintf(time_str, "%d", cfg_data.wakeup_timeout_min);
     show_setup_item(sm_area, &time_str[0]);
   }
 }
