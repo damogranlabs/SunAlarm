@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define DEFAULT_WAKEUP_TIME_MIN 30
-#define DEFAULT_WAKEUP_TIMEOUT_MIN 1
+#define DEFAULT_WAKEUP_TIMEOUT_MIN 30
 #define WAKEUP_TIME_MOD_FACTOR 1 // multiplier when wake up time is modified via encoder
 #define DEFAULT_SUN_INTENSITY_MAX SUN_INTENSITY_MAX
 #define DEFAULT_SUN_INTENSITY SUN_INTENSITY_MAX / 2
