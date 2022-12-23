@@ -4,7 +4,7 @@ And, yeah, it is nothing new - you can buy that at Amazon for 50$ and it will al
 
 ![SunAlarm](images/SunAlarm_case.jpg)  
 ![sunrise - intensity growing](images/sunrise.jpg)  
-
+![setup menu](images/setup_menu.gif)
 Currently 12V LED strip is controlled via mosfet, but any kind (within transistor/wiring limits) light source can be used.
 
 
