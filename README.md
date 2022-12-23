@@ -5,7 +5,20 @@ And, yeah, it is nothing new - you can buy that at Amazon for 50$ and it will al
 ![SunAlarm](images/SunAlarm_case.jpg)  
 ![sunrise - intensity growing](images/sunrise.jpg)  
 ![setup menu](images/setup_menu.gif)
-Currently 12V LED strip is controlled via mosfet, but any kind (within transistor/wiring limits) light source can be used.
+
+In english this would correspond to settings: 
+* Sunrise time (time that light intensity is gradually increased).
+* Value of maximum intensity (in percent).
+* Night light intensity (light of constant intensity, powered on/off by user).
+* Automatic shutdown time (after wake up time is reached).
+* Time settings (h, m). 
+
+"Kava ob" is wake up time, translated to: "Coffee at". At that (wake up) time, light intensity has reached its
+user defined max intensity.  
+These strings can be easily translated, see *user\display_ctrl.c*.
+
+Currently 12V LED strip is controlled via MOSFET, but any kind of light source can be used, depending on your HW.  
+HW is not described in details here, but required pins and configuration can be seen from CubeMX project or source files directly.
 
 
 ## UI
