@@ -20,7 +20,6 @@ These strings can be easily translated, see *user\display_ctrl.c*.
 Currently 12V LED strip is controlled via MOSFET, but any kind of light source can be used, depending on your HW.  
 HW is not described in details here, but required pins and configuration can be seen from CubeMX project or source files directly.
 
-
 ## UI
 Setup button:
 * Single press: toggle alarm on/off; Rot. encoder: changes alarm time
@@ -31,5 +30,7 @@ Light button:
 * Holding button and rotating rot. encoder: changes current intensity value, if light is enabled
 
 ## Issues
-No external crystal and therefore time drift - the PCB I have is some custom motor driver which has been reused for this purpose.  
+No external crystal and therefore time slightly drifts - the PCB I have is some custom motor driver 
+which has been reused for this purpose and has no easy option of adding external crystal.  
+Currently time drifts about 2 min per month.    
 Real solution should include external oscillator which could be further trimmed via FW.
