@@ -49,8 +49,8 @@ extern "C"
 // #define RTC_SYNCHPRESCALER 8190 // 499.57
 // #define RTC_SYNCHPRESCALER 8185 // 499.83-87
 // #define RTC_SYNCHPRESCALER 8180 // 500.17
-#define RTC_SYNCHPRESCALER 8182 // 500.04mHz // 500.0(1-3)mHz
-  // #define RTC_SYNCHPRESCALER 8183 // 499.96 mHz
+// #define RTC_SYNCHPRESCALER 8182 // 500.04mHz // 500.0(1-3)mHz (bad, drifting forward too much)
+#define RTC_SYNCHPRESCALER 8183 // 499.96 mHz
   // #define RTC_SYNCHPRESCALER 8184 // 499.91  mHz
 
 #elif DOMENS_PCB
