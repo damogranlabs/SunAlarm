@@ -46,12 +46,12 @@ extern "C"
 // Each second is about 40us ahead.
 // That is about 3.45 second/per day, about 1.7 min/month (30 days)
 #define RTC_ASYNCHPRESCALER 4
-// #define RTC_SYNCHPRESCALER 8190 // 499.57
-// #define RTC_SYNCHPRESCALER 8185 // 499.83-87
-// #define RTC_SYNCHPRESCALER 8180 // 500.17
-// #define RTC_SYNCHPRESCALER 8182 // 500.04mHz // 500.0(1-3)mHz (bad, drifting forward too much)
-#define RTC_SYNCHPRESCALER 8183 // 499.96 mHz
-  // #define RTC_SYNCHPRESCALER 8184 // 499.91  mHz
+  // #define RTC_SYNCHPRESCALER 8190 // 499.57
+  // #define RTC_SYNCHPRESCALER 8185 // 499.83-87
+  // #define RTC_SYNCHPRESCALER 8180 // 500.17
+  // #define RTC_SYNCHPRESCALER 8182 // 500.04mHz // 500.0(1-3)mHz (bad, drifting forward too much)
+  // #define RTC_SYNCHPRESCALER 8183 // 499.96 mHz // (bad, drifting forward too much)
+#define RTC_SYNCHPRESCALER 8184 // 499.91  mHz
 
 #elif DOMENS_PCB
 // Each second is about 20us behind.
